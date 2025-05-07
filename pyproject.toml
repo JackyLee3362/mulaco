@@ -1,0 +1,9 @@
+[project]
+name = "mulaco-v2"
+version = "0.0.1"
+description = ""
+requires-python = ">=3.8,<3.14"
+authors = [{ name = "jackylee", email = "jieli.work@qq.com" }]
+readme = "README.md"
+dependencies = [
+]
