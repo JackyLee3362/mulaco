@@ -1,0 +1,14 @@
+[app]
+name = "mulaco"
+version = "0.0.1"
+
+[app.logging]
+# debug = 10 , info = 20
+console_level = 10
+file_level = 20
+log_filename_fmt = "%Y-%m-%d %H-%M-%S.log"
+date_fmt = "%Y-%m-%d %H:%M:%S"
+fmt = "[%(asctime)s] %(name)s - %(levelname)-8s %(funcName)s  : %(message)s"
+
+[app.db]
+url = "sqlite://db/app.db"
