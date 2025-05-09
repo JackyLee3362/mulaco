@@ -12,3 +12,9 @@ fmt = "[%(asctime)s] %(name)s - %(levelname)-8s %(funcName)s  : %(message)s"
 
 [app.db]
 url = "sqlite://db/app.db"
+
+[app.cache]
+url = "db/cache.json"
+
+[app.translate]
+url = "config/my_dict.json"
