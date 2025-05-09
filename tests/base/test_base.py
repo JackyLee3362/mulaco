@@ -25,5 +25,5 @@ def test_logger(app_base: AppBase):
 
 
 def test_db(app_base: AppBase):
-    app_base.base_db.set("hello", "world")
-    assert app_base.base_db.get("hello") == "world"
+    app_base.cache.set("hello", "世界")
+    assert app_base.cache.get("hello") == "世界"

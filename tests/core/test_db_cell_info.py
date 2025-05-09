@@ -32,7 +32,7 @@ def db():
 def test_cell_insert_one(db: CellInfoRepo):
     c1 = cell_info_factory(1, 4, 2)
     db.insert_one(c1)
-    print(db.list())
+    print(db.list_all())
 
 
 @pytest.mark.skip()
@@ -42,12 +42,12 @@ def test_cell_insert_all(db: CellInfoRepo):
     c3 = cell_info_factory(2, 4, 2)
     c4 = cell_info_factory(2, 5, 2)
     db.insert_all([c1, c2, c3, c4])
-    pprint(db.list())
+    pprint(db.list_all())
 
 
 def test_cell_update(db: CellInfoRepo):
-    pprint(db.list())
+    pprint(db.list_all())
     c1 = cell_info_factory(1, 4, 2, "zh")
     db.update_by_cell_info(c1)
     db.session.commit()
-    pprint(db.list())
+    pprint(db.list_all())

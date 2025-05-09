@@ -23,14 +23,14 @@ def test_add_exsh(db_service: DbService):
 
 def test_add_cell_info(db_service: DbService):
     db_service.add_exsh(exsh)
-    db_service.add_cell_info(exsh, cell)
+    db_service.add_cell_info(exsh.excel, exsh.sheet, cell)
     pprint(db_service.get_all_exsh())
     pprint(db_service.get_all_cell_info())
 
 
 def test_add_trans_info(db_service: DbService):
     db_service.add_exsh(exsh)
-    db_service.add_cell_info(exsh, cell)
+    db_service.add_cell_info(exsh.excel, exsh.sheet, cell)
     db_service.add_trans_info(exsh, cell, trans)
     pprint(db_service.get_all_exsh())
     pprint(db_service.get_all_cell_info())

@@ -27,7 +27,7 @@ def db():
 def test_cell_insert_one(db: TransInfoRepo):
     c1 = trans_info_factory(1, 4, 2)
     db.insert_one(c1)
-    print(db.list())
+    print(db.list_all())
 
 
 @pytest.mark.skip()
@@ -37,12 +37,12 @@ def test_cell_insert_all(db: TransInfoRepo):
     c3 = trans_info_factory(3)
     c4 = trans_info_factory(4)
     db.insert_all([c1, c2, c3, c4])
-    pprint(db.list())
+    pprint(db.list_all())
 
 
 def test_cell_update(db: TransInfoRepo):
-    pprint(db.list())
+    pprint(db.list_all())
     c1 = trans_info_factory(1, "ru")
     db.update_by_trans_info(c1)
     db.session.commit()
-    pprint(db.list())
+    pprint(db.list_all())
