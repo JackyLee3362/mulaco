@@ -6,7 +6,7 @@ from tinydb import Query, TinyDB
 log = logging.getLogger(__name__)
 
 
-class KVDB:
+class KVCache:
     """KV 数据库
     使用 json 文件存储，方便直接修改
     """
@@ -17,24 +17,28 @@ class KVDB:
         self.db = TinyDB(db_url)
         self.query = Query()
 
-    def set(self, key: str, value: str | dict, tbl_name: str = None):
-        table = self.db.table(tbl_name) if tbl_name else self.db
+    def set(self, key: str, value: str | dict, tbl: str = None):
+        table = self.db.table(tbl) if tbl else self.db
         res = table.search(self.query.key == key)
         if res:
             log.debug("数据已存在，更新键")
-            table.update({"value": value}, self.query.key == key)
+            table.update({"val": value}, self.query.key == key)
         else:
             log.debug("数据不存在，插入键")
-            table.insert({"key": key, "value": value})
+            table.insert({"key": key, "val": value})
 
-    def get(self, key: str, tbl_name: str = None, default: str | dict = None):
-        table = self.db.table(tbl_name) if tbl_name else self.db
+    def get(self, key: str, tbl: str = None, default: str | dict | list = None):
+        table = self.db.table(tbl) if tbl else self.db
         res = table.search(self.query.key == key)
         if res:
             log.debug("数据存在，直接返回")
-            return res[0]["value"]
+            return res[0]["val"]
         log.warning("数据不存在，返回默认值")
         return default
+
+    def get_all(self, tbl: str = None):
+        table = self.db.table(tbl) if tbl else self.db
+        return table.all()
 
     def close(self):
         log.debug("关闭数据库")

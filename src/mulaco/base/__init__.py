@@ -1,5 +1,5 @@
 from mulaco.base.constant import KVDB_PATH, LOG_DIR_PATH, SETTING_FILE_PATH
-from mulaco.base.db import KVDB
+from mulaco.base.db import KVCache
 from mulaco.base.logger import set_logger
 from mulaco.base.settings import TomlConfig
 
@@ -11,12 +11,16 @@ class AppBase:
         # 初始化
         self.config = None
         self.log_config = None
-        self.base_db = None
+        self.cache = None
+        self.has_setup = False
 
     def setup(self):
-        self.setup_config()
-        self.setup_logging()
-        self.setup_base_db()
+        # 只会初始化一次
+        if not self.has_setup:
+            self.setup_config()
+            self.setup_logging()
+            self.setup_base_db()
+        self.has_setup = True
 
     def setup_config(self):
         # 初始配置
@@ -40,7 +44,7 @@ class AppBase:
     def setup_base_db(self):
         # 数据库配置
         try:
-            self.base_db = KVDB(db_url=KVDB_PATH)
+            self.cache = KVCache(db_url=self.config.app.cache.url)
         except Exception as e:
             print(e)
             raise RuntimeError("数据库配置错误")

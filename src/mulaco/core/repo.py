@@ -20,13 +20,17 @@ class BaseRepo(Generic[T]):
         self.model = model
         self.session = session
 
-    def list(self, skip: int = 0, limit: int = 100) -> List[T]:
+    def list_all(self, skip: int = 0, limit: int = 100) -> List[T]:
         """获取对象列表（支持分页）"""
         stmt = select(self.model).offset(skip).limit(limit)
         return list(self.session.scalars(stmt).all())
 
     def get_by_id(self, id: int) -> T | None:
         return self.session.get(self.model, id)
+
+    def get_list_by_cond(self, condi: List) -> List[T]:
+        stmt = select(self.model).where(*condi)
+        return self.session.scalars(stmt).all()
 
     def insert_one(self, instance: T) -> T:
         self.session.add(instance)
@@ -36,7 +40,8 @@ class BaseRepo(Generic[T]):
         self.session.add_all(instances)
 
     def update_by_id(self, instance: T) -> T:
-        self.session.merge(instance)
+        new_instance = self.session.merge(instance)
+        return new_instance
 
 
 class ExcelSheetRepo(BaseRepo[ExcelSheet]):
@@ -45,18 +50,18 @@ class ExcelSheetRepo(BaseRepo[ExcelSheet]):
     def __init__(self, session):
         super().__init__(ExcelSheet, session)
 
-    def get_by_exsh_name(self, exsh: ExcelSheet) -> ExcelSheet:
+    def get_by_exsh_name(self, excel_name: str, sheet_name: str) -> ExcelSheet:
         return self.session.scalar(
             select(ExcelSheet).where(
-                ExcelSheet.excel == exsh.excel, ExcelSheet.sheet == exsh.sheet
+                ExcelSheet.excel == excel_name, ExcelSheet.sheet == sheet_name
             )
         )
 
-    def update_by_exsh_name(self, exsh: ExcelSheet) -> None:
-        obj = self.get_by_exsh_name(exsh)
+    def update_by_exsh_name(self, exsh: ExcelSheet) -> ExcelSheet:
+        obj = self.get_by_exsh_name(exsh.excel, exsh.sheet)
         if obj:
             exsh.id = obj.id
-        self.update_by_id(exsh)
+        return self.update_by_id(exsh)
 
 
 class CellInfoRepo(BaseRepo[CellInfo]):
@@ -74,11 +79,17 @@ class CellInfoRepo(BaseRepo[CellInfo]):
             )
         )
 
-    def update_by_cell_info(self, cell: CellInfo) -> None:
+    def update_by_cell_info(self, cell: CellInfo) -> CellInfo:
         obj = self.get_by_cell_info(cell)
         if obj:
             cell.id = obj.id
-        self.update_by_id(cell)
+        return self.update_by_id(cell)
+
+    def batch_delete_by_exid(self, exid: int) -> None:
+        objs = self.get_list_by_cond((CellInfo.exsh_id == exid))
+        for obj in objs:
+            obj.delete = True
+            self.session.merge(obj)
 
 
 class TransInfoRepo(BaseRepo[TransInfo]):
@@ -94,8 +105,14 @@ class TransInfoRepo(BaseRepo[TransInfo]):
             )
         )
 
-    def update_by_trans_info(self, info: TransInfo) -> None:
+    def update_by_trans_info(self, info: TransInfo) -> TransInfo:
         obj = self.get_by_trans_info(info)
         if obj:
             info.id = info.id
-        self.update_by_id(info)
+        return self.update_by_id(info)
+
+    def batch_delete_by_cell_id(self, cell_id: int) -> None:
+        objs = self.get_list_by_cond((TransInfo.cell_id == cell_id))
+        for obj in objs:
+            obj.delete = True
+            self.session.merge(obj)

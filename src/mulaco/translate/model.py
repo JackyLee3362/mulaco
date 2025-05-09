@@ -13,8 +13,7 @@ class Language:
 class Languages:
     zh = Language("简中", "zh")
     en = Language("英语", "en")
-    jp = Language("日语", "ja")
-
+    jp = Language("日语", "jp")
     de = Language("德语", "de")
     ko = Language("韩语", "ko")
     th = Language("泰语", "th")
