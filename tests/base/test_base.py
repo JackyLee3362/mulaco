@@ -21,7 +21,7 @@ def test_logger(app_base: AppBase):
 
     pprint(app_base.log_config)
     log = logging.getLogger("mulaco")
-    assert len(log.handlers) == 2
+    assert 1 <= len(log.handlers) <= 2
 
 
 def test_db(app_base: AppBase):

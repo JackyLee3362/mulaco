@@ -2,8 +2,8 @@ from pprint import pprint
 
 from mulaco.base import AppBase
 from mulaco.base.settings import TomlConfig
-from mulaco.core.service import DbService
-from mulaco.translate.api import DeepLApi, TencentApi
+from mulaco.db.service import DbService
+from mulaco.translate.cli import DeepLCli, TencentCli
 from mulaco.translate.model import LanguagesConfig
 from mulaco.translate.service import TranslateService
 
@@ -17,8 +17,8 @@ app.setup()
 db = DbService("sqlite:///:memory:")
 
 service = TranslateService(db, app.cache)
-deepl = DeepLApi(app.cache)
-tencent = TencentApi(app.cache)
+deepl = DeepLCli(app.cache)
+tencent = TencentCli(app.cache)
 
 
 def test_1_register_service():

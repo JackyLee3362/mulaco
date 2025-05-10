@@ -4,13 +4,13 @@ from pprint import pprint
 from pytest_mock import MockerFixture
 
 from mulaco.base import AppBase
-from mulaco.translate.api import DeepLApi
+from mulaco.translate.cli import DeepLCli
 
 my_dict = "config/dict.json"
 app = AppBase()
 app.setup()
 cache = app.cache
-deepl_api = DeepLApi(cache)
+deepl_api = DeepLCli(cache)
 
 
 def test_translate():

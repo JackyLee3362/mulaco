@@ -3,13 +3,13 @@ from pprint import pprint
 import tomllib
 
 from mulaco.base import AppBase
-from mulaco.translate.api import LocalApi
+from mulaco.translate.cli import LocalCli
 
 my_dict = "config/dict.toml"
 app = AppBase()
 app.setup()
 cache = app.cache
-local_api = LocalApi(cache)
+local_api = LocalCli(cache)
 
 
 def test_my_dict():

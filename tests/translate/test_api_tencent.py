@@ -1,13 +1,13 @@
 from pprint import pprint
 
 from mulaco.base import AppBase
-from mulaco.translate.api import TencentApi
+from mulaco.translate.cli import TencentCli
 
 my_dict = "config/dict.json"
 app = AppBase()
 app.setup()
 cache = app.cache
-tencent_api = TencentApi(cache)
+tencent_api = TencentCli(cache)
 
 
 def test_1():
