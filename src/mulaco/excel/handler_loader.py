@@ -4,7 +4,7 @@ import xlwings as xw
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from mulaco.base.db import KVCache
+from mulaco.base.db import JsonCache
 from mulaco.core.db_models import CellInfo, ExcelSheet
 from mulaco.core.service import DbService
 from mulaco.excel.model import ExcelDTO, SheetDTO
@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 class ExcelHandler:
     cache_tbl = "excels"
 
-    def __init__(self, excel: ExcelDTO, db: DbService, cache: KVCache):
+    def __init__(self, excel: ExcelDTO, db: DbService, cache: JsonCache):
         self.excel = excel
         self.db = db
         self.cache = cache
@@ -48,7 +48,7 @@ class ExcelLoader(ExcelHandler):
             sheet=sheet_dto.sheet_name,
             header=sheet_dto.header_row,
         )
-        exsh = self.db.add_exsh(exsh_po)
+        exsh = self.db.upsert_exsh(exsh_po)
         return exsh
 
     def cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
@@ -80,5 +80,4 @@ class ExcelLoader(ExcelHandler):
 
 class ExcelExporter(ExcelHandler):
 
-    def writer(self):
-        pass
+    def writer(self): ...

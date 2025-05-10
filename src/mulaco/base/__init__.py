@@ -1,5 +1,5 @@
 from mulaco.base.constant import KVDB_PATH, LOG_DIR_PATH, SETTING_FILE_PATH
-from mulaco.base.db import KVCache
+from mulaco.base.db import JsonCache
 from mulaco.base.logger import set_logger
 from mulaco.base.settings import TomlConfig
 
@@ -44,7 +44,7 @@ class AppBase:
     def setup_base_db(self):
         # 数据库配置
         try:
-            self.cache = KVCache(db_url=self.config.app.cache.url)
+            self.cache = JsonCache(db_url=self.config.app.cache.url)
         except Exception as e:
             print(e)
             raise RuntimeError("数据库配置错误")

@@ -1,5 +1,5 @@
 import logging
-from typing import Generic, List, TypeVar
+from typing import Generic, Iterable, List, TypeVar
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -20,15 +20,17 @@ class BaseRepo(Generic[T]):
         self.model = model
         self.session = session
 
-    def list_all(self, skip: int = 0, limit: int = 100) -> List[T]:
+    def list_all(self, skip: int = 0, limit: int = 0) -> List[T]:
         """获取对象列表（支持分页）"""
-        stmt = select(self.model).offset(skip).limit(limit)
+        stmt = select(self.model).offset(skip)
+        if limit > 0:
+            stmt.limit(limit)
         return list(self.session.scalars(stmt).all())
 
     def get_by_id(self, id: int) -> T | None:
         return self.session.get(self.model, id)
 
-    def get_list_by_cond(self, condi: List) -> List[T]:
+    def get_list_by_cond(self, condi: tuple) -> List[T]:
         stmt = select(self.model).where(*condi)
         return self.session.scalars(stmt).all()
 

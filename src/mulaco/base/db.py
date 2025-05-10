@@ -6,8 +6,8 @@ from tinydb import Query, TinyDB
 log = logging.getLogger(__name__)
 
 
-class KVCache:
-    """KV 数据库
+class JsonCache:
+    """json 数据库
     使用 json 文件存储，方便直接修改
     """
 

@@ -18,7 +18,7 @@ def set_logger(
     date_fmt: str = None,
     fmt: str = None,
     *args,
-    **kwargs
+    **kwargs,
 ) -> None:
     """日志配置
 
@@ -37,6 +37,8 @@ def set_logger(
     >>> #log.info("hello")
     """
     log = logging.getLogger(logger_name)
+    if len(log.handlers) > 0:
+        return
     log.setLevel(console_level)
 
     # 控制台处理器

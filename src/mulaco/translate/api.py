@@ -20,13 +20,15 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
 # pip install --upgrade tencentcloud-sdk-python-tmt
 from tencentcloud.tmt.v20180321 import models, tmt_client
 
-from mulaco.base.db import KVCache
+from mulaco.base.db import JsonCache
 from mulaco.core.service import DbService as DbService
 
 log = getLogger(__name__)
 
 
 class TranslateApi(metaclass=ABCMeta):
+    name = "api-name"
+
     @abstractmethod
     def api_translate_text(self, src: str, dst: str, text: str) -> str: ...
 
@@ -48,7 +50,7 @@ class ServiceCache:
     CACHE_TBL = "default-service-cache"
     GLOSSARY_KEY = "glossary-key"
 
-    def __init__(self, cache: KVCache):
+    def __init__(self, cache: JsonCache):
         self.cache = cache
 
     def get_gid_key(self, src: str, dst: str):
@@ -82,7 +84,7 @@ class LocalApi(TranslateApi, ServiceCache):
 
     CACHE_TBL = "local-trans-cache"
 
-    def __init__(self, cache: KVCache):
+    def __init__(self, cache: JsonCache):
         self.cache = cache
         ServiceCache.__init__(self, cache)
 
@@ -153,10 +155,12 @@ class LocalApi(TranslateApi, ServiceCache):
 class DeepLApi(TranslateApi, ServiceCache):
     """DeepLApi 客户端"""
 
+    name = "deepl-pro"
+
     DEEPL_AUTH_KEY = os.getenv("DEEPL_AUTH_KEY")
     CACHE_TBL = "deepl-cache"
 
-    def __init__(self, cache: KVCache):
+    def __init__(self, cache: JsonCache):
         """初始化
 
         Args:
@@ -238,9 +242,11 @@ class DeepLApi(TranslateApi, ServiceCache):
 class TencentApi(TranslateApi):
     """DeepLApi 客户端"""
 
+    name = "tencent-cloud"
+
     CACHE_TBL = "tencent-cache"
 
-    def __init__(self, cache: KVCache):
+    def __init__(self, cache: JsonCache):
         self.cache = cache
         id = os.getenv("TENCENTCLOUD_SECRET_ID")
         key = os.getenv("TENCENTCLOUD_SECRET_KEY")
@@ -255,3 +261,15 @@ class TencentApi(TranslateApi):
         req.ProjectId = 0
         resp = self.client.TextTranslate(req)
         return resp.TargetText
+
+    def api_create_glossary(self, src, dst, entries):
+        return super().api_create_glossary(src, dst, entries)
+
+    def api_get_glossary(self, src, dst):
+        return super().api_get_glossary(src, dst)
+
+    def api_list_glossaries(self):
+        return super().api_list_glossaries()
+
+    def api_delete_glossary(self, src, dst):
+        return super().api_delete_glossary(src, dst)

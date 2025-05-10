@@ -1,37 +1,20 @@
-from functools import lru_cache
+from dataclasses import dataclass, field
+
+from dataclasses_json import dataclass_json
 
 
+@dataclass_json
+@dataclass
 class Language:
-    def __init__(self, name: str, code: str):
-        self.name = name
-        self.code = code
-
-    def __str__(self):
-        return self.code
-
-
-class Languages:
-    zh = Language("简中", "zh")
-    en = Language("英语", "en")
-    jp = Language("日语", "jp")
-    de = Language("德语", "de")
-    ko = Language("韩语", "ko")
-    th = Language("泰语", "th")
-    ru = Language("俄语", "ru")
-    es = Language("西语", "es")
-    fr = Language("法语", "fr")
-    pt = Language("葡语", "pt-br")
-    it = Language("意语", "it")
-
-    deepl = [de, ko, ru, es, fr, pt, it]
-    tencent = [th]
-    src_langs: list[Language] = [en, zh]
-    dst_langs: list[Language] = [de, ko, th, ru, es, fr, pt, it]
-    fixed_lang = set([ko, th, ru])
+    name: str
+    code: str
+    active: bool = field(default=True)
+    offset: int = field(default=None)
+    service_name: str = field(default=None)
+    service: object = field(init=False, repr=False)
 
 
-@lru_cache
-def get_lang_by_code(code: str) -> Language:
-    for dst_lang in Languages.dst_langs:
-        if dst_lang.code == code:
-            return dst_lang
+@dataclass_json
+@dataclass
+class LanguagesConfig:
+    langs: list[Language]
