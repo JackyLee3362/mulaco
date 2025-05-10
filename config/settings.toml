@@ -17,4 +17,8 @@ url = "sqlite://db/app.db"
 url = "db/cache.json"
 
 [app.translate]
-url = "config/my_dict.json"
+# 相对路径
+lang_url = "config/lang.toml"
+dict_url = "config/dict.toml"
+
+
