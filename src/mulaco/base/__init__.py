@@ -36,7 +36,7 @@ class AppBase:
         try:
             root_module_name = __name__.split(".")[0]
             self.log_config = self.config.app.logging
-            set_logger(root_module_name, log_dir=LOG_DIR_PATH, **self.log_config)
+            set_logger(root_module_name, **self.log_config)
         except Exception as e:
             print(e)
             raise RuntimeError("日志配置错误")

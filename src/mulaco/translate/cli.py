@@ -21,12 +21,12 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
 from tencentcloud.tmt.v20180321 import models, tmt_client
 
 from mulaco.base.db import JsonCache
-from mulaco.core.service import DbService as DbService
+from mulaco.db.service import DbService as DbService
 
 log = getLogger(__name__)
 
 
-class TranslateApi(metaclass=ABCMeta):
+class TranslateCli(metaclass=ABCMeta):
     name = "api-name"
 
     @abstractmethod
@@ -79,7 +79,7 @@ class ServiceCache:
         return val
 
 
-class LocalApi(TranslateApi, ServiceCache):
+class LocalCli(TranslateCli, ServiceCache):
     """本地缓存翻译，主要加载本地的术语字典"""
 
     CACHE_TBL = "local-trans-cache"
@@ -152,7 +152,7 @@ class LocalApi(TranslateApi, ServiceCache):
         return self.cache.get(self.GLOSSARY_KEY, tbl=self.CACHE_TBL, default=[])
 
 
-class DeepLApi(TranslateApi, ServiceCache):
+class DeepLCli(TranslateCli, ServiceCache):
     """DeepLApi 客户端"""
 
     name = "deepl-pro"
@@ -239,7 +239,7 @@ class DeepLApi(TranslateApi, ServiceCache):
             log.warning(f"Cache 中不存在 glossary key: {key}")
 
 
-class TencentApi(TranslateApi):
+class TencentCli(TranslateCli):
     """DeepLApi 客户端"""
 
     name = "tencent-cloud"

@@ -3,8 +3,8 @@ from __future__ import annotations
 from logging import getLogger
 
 from mulaco.base.db import JsonCache
-from mulaco.core.service import DbService as DbService
-from mulaco.translate.api import TranslateApi
+from mulaco.db.service import DbService as DbService
+from mulaco.translate.cli import TranslateCli
 
 from .model import Language, LanguagesConfig
 
@@ -15,11 +15,11 @@ class TranslateService:
     def __init__(self, db: DbService, cache: JsonCache):
         self.db = db
         self.cache = cache
-        self.api_services: dict[str, TranslateApi] = {}
-        self.lang_mapper: list[str, Language] = {}
+        self.api_services: dict[str, TranslateCli] = {}
+        self.lang_mapper: dict[str, Language] = {}
         self.dst_langs: list[Language] = []
 
-    def register_service(self, api: TranslateApi):
+    def register_service(self, api: TranslateCli):
         self.api_services[api.name] = api
 
     def setup_config(self, langs_config: LanguagesConfig):
@@ -35,7 +35,51 @@ class TranslateService:
                 dst_langs.append(lang)
         self.dst_langs = sorted(dst_langs, key=lambda x: x.offset)
 
-    # def translate(self):
+    def translate_exsh(
+        self,
+        src: str,
+        dst: str,
+        excel: str,
+        sheet: str,
+        col: int,
+        max_row: int,
+        header_row: int,
+    ):
+        """翻译 exsh"""
+        # 获得所有已经翻译过的 trans
+        translated = self.db.get_all_translated_cell(src, dst, excel, sheet, col)
+        start_row = header_row
+        if len(translated):
+            start_row = translated[-1]
+        for row in range(start_row + 1, max_row + 1):
+            cell = self.db.get_cell_by_name(excel, sheet, row, col)
+            text = cell.proc_text
+            translated = self.translate_core(src, dst, text)
+            # self.db.add_trans_info()
+
+        #     根据 ex 或者所有 cells
+        #     cell in cells 遍历 cells
+        #         如果没有翻译过，翻译
+        #         translate_core(...)
+        #         写到数据库
+        #         trans_info = add_trans_info_to_db(...)
+        #
+
+    def translate_core(self, src: str, dst: str, text: str):
+        dst_lang = self.lang_mapper[dst]
+        self.pre_translate()
+        service: TranslateCli = dst_lang.service
+        service.api_translate_text(src, dst, text)
+        self.post_translate()
+
+    def pre_translate(self, text: str):
+        """Tag 处理, 链接处理"""
+        return text
+
+    def post_translate(self, text: str):
+        """翻译质量检查，删除多余括号等"""
+        return text
+
     #     en = LanguagesConfig.en
     #     for dst_lang, service in self.services.items():
     #         key = f"{en}_{dst_lang}"

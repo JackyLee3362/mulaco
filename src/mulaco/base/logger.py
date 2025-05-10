@@ -46,7 +46,7 @@ def set_logger(
     log.addHandler(console_handler)
 
     # 格式化
-    if log_dir is None:
+    if log_dir is None or log_dir == "":
         return
     _fmt = fmt or default_fmt
     _date_fmt = date_fmt or default_date_fmt

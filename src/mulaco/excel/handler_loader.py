@@ -5,8 +5,8 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from mulaco.base.db import JsonCache
-from mulaco.core.db_models import CellInfo, ExcelSheet
-from mulaco.core.service import DbService
+from mulaco.core.models import CellInfoBO, ExcelSheetBO
+from mulaco.db.service import DbService
 from mulaco.excel.model import ExcelDTO, SheetDTO
 from mulaco.excel.utils import excel_col_alpha2num
 
@@ -36,20 +36,19 @@ class ExcelLoader(ExcelHandler):
                 self.cache_exsh_meta_data(sheet.max_row, sheet.max_column, sheet_dto)
                 self.persist_sheet_raw_data(sheet, sheet_dto)
         except Exception as e:
-            log.exception(e)
+            # log.exception(e)
             log.error(f"{self.excel} 载入数据时发生错误")
         finally:
             wb.close()
 
     def persist_exsh_meta(self, sheet_dto: SheetDTO) -> int:
         """持久化存 ExcelSheet 元数据"""
-        exsh_po = ExcelSheet(
+        exsh_bo = ExcelSheetBO(
             excel=self.excel.excel_name,
             sheet=sheet_dto.sheet_name,
             header=sheet_dto.header_row,
         )
-        exsh = self.db.upsert_exsh(exsh_po)
-        return exsh
+        return self.db.upsert_exsh(exsh_bo)
 
     def cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
         """缓存元数据"""
@@ -60,10 +59,12 @@ class ExcelLoader(ExcelHandler):
 
     def persist_sheet_raw_data(self, sheet: Worksheet, sheet_dto: SheetDTO):
         """持久化 Sheet 中的原始数据"""
+        # 存 EXSH 中的数据
         max_row = sheet_dto.max_row
         col_dto = sheet_dto.lang_cols
         ex_name = self.excel.excel_name
         sh_name = sheet_dto.sheet_name
+        exsh_bo = self.db.get_exsh_by_name(ExcelSheetBO(ex_name, sh_name, None))
         # 遍历每个 languages 对象，一般来说是 zh 和 en
         for col_dto in sheet_dto.lang_cols:
             lang = col_dto.src_lang
@@ -74,8 +75,10 @@ class ExcelLoader(ExcelHandler):
                 for row in range(sheet_dto.header_row + 1, max_row + 1):
                     loc = f"{col_alpha}{row}"
                     raw_text = sheet[loc].value
-                    cell = CellInfo(row=row, col=col, src_lang=lang, raw_text=raw_text)
-                    self.db.add_cell_info(ex_name, sh_name, cell)
+                    cell = CellInfoBO(
+                        row=row, col=col, src_lang=lang, raw_text=raw_text, exsh=exsh_bo
+                    )
+                    self.db.upsert_cell(cell)
 
 
 class ExcelExporter(ExcelHandler):
