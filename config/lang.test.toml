@@ -45,9 +45,8 @@ offset = 5
 service_name = "mock-cli"
 
 [[translate.model.langs]]
-name = 'fr'
+name = '法语'
 code = 'fr'
-desc = '法语'
 offset = 6
 service_name = "mock-cli"
 
