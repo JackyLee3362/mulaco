@@ -4,24 +4,14 @@ import xlwings as xw
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from mulaco.base.db import JsonCache
 from mulaco.core.models import CellInfoBO, ExcelSheetBO
 from mulaco.db.mapper import exsh_bo_map_po
 from mulaco.db.models import CellInfoPO
-from mulaco.db.service import DbService
-from mulaco.excel.model import ExcelDTO, SheetDTO
+from mulaco.excel.base_handler import ExcelHandler
+from mulaco.excel.model import SheetDTO
 from mulaco.excel.utils import excel_col_alpha2num
 
 log = logging.getLogger(__name__)
-
-
-class ExcelHandler:
-    CACHE_TBL = "excels"
-
-    def __init__(self, excel: ExcelDTO, db: DbService, cache: JsonCache):
-        self.excel = excel
-        self.db = db
-        self.cache = cache
 
 
 class ExcelLoader(ExcelHandler):
@@ -100,9 +90,3 @@ class ExcelLoader(ExcelHandler):
                     )
                     self.db.upsert_cell(cell_po)
                 log.debug(f"已处理 {ex_name}.{sh_name} 的 {col_alpha} 列")
-
-
-class ExcelExporter(ExcelHandler):
-
-    def writer(self):
-        pass
