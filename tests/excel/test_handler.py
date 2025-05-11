@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 
 from mulaco.base import AppBase
 from mulaco.db.service import DbService
-from mulaco.excel.handler_loader import ExcelLoader
+from mulaco.excel.handler import ExcelLoader
 from mulaco.excel.model import BatchExcel, SheetDTO
 
 
@@ -27,7 +27,7 @@ def handler():
     yield ExcelLoader(excel, db, cache)
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_handler_loader(handler: ExcelLoader):
     """手动构造并生成数据"""
     sheet_dto = handler.excel.sheets[0]
@@ -50,7 +50,6 @@ def test_handler_loader(handler: ExcelLoader):
     pprint(len(cells))
 
 
-@pytest.mark.skip()
 def test_handler_loader_2(handler: ExcelLoader):
     """测试构造并生成数据"""
     handler.loader()

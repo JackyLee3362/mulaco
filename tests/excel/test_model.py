@@ -1,11 +1,11 @@
 import os
-import tomllib
 from pprint import pprint
 
 import pytest
+import tomllib
 
 from mulaco.base import AppBase
-from mulaco.excel.model import BatchExcel, ExcelDTO, LangColumns, SheetDTO
+from mulaco.excel.model import BatchExcel, ExcelDTO, SheetDTO
 
 app = AppBase()
 app.setup()
@@ -38,3 +38,10 @@ def test_cache_config():
         app.cache.set(key, d2, config_file)
     res = app.cache.get_all()
     pprint(res)
+
+
+def test_cache_to_model():
+    CACHE_EXCEL_TBL = "excels"
+    d = app.cache.get("ClothingConfig.xlsx", CACHE_EXCEL_TBL)
+    res = ExcelDTO.from_dict(d)
+    print(res)
