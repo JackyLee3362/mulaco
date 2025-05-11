@@ -14,8 +14,8 @@ class SheetDTO:
     sheet_name: str
     lang_cols: dict[str, list[str]]
     header_row: int = field(repr=False)
-    max_row: int = field(init=False, repr=False, default=0)
-    max_col: int = field(init=False, repr=False, default=0)  # index 从 1 开始
+    max_row: int = field(repr=False, default=None)
+    max_col: int = field(repr=False, default=None)  # index 从 1 开始
     is_term: bool = field(default=False, repr=False)
 
     # ref_excel: Optional[str] = field(default=None)
@@ -29,12 +29,12 @@ class ExcelDTO:
     excel_name: str
     sheets: list[SheetDTO]
     skip: bool = field(default=False, repr=False)
-    src_path: str = field(init=False, repr=False)
-    dst_path: str = field(init=False, repr=False)
+    src_path: str = field(default=None, repr=False)
+    dst_path: str = field(default=None, repr=False)
 
     def from_dict(self, *args, **kwargs) -> ExcelDTO: ...
 
-    def to_dict(self, *args, **kwargs) -> ExcelDTO: ...
+    def to_dict(self, *args, **kwargs) -> dict: ...
 
 
 @dataclass_json

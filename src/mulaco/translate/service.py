@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from glob import translate
 from logging import getLogger
 
 from mulaco.base.db import JsonCache
@@ -29,9 +28,9 @@ class TranslateService:
     def register_service(self, api: TranslateCli):
         self.api_services[api.name] = api
 
-    def setup_config(self, langs_config: LanguagesConfig):
+    def setup_lang_config(self, langs_config: LanguagesConfig):
         """配置待翻译语言"""
-        dst_langs = []
+        dst_langs: list[Language] = []
         for lang in langs_config.langs:
             # 默认加入
             self.lang_mapper[lang.code] = lang

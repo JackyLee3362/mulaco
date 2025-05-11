@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class ExcelLoader(ExcelHandler):
+    # -------------------- loader --------------------
 
     def loader(self):
         """
@@ -30,16 +31,18 @@ class ExcelLoader(ExcelHandler):
             wb = load_workbook(self.excel.src_path)
             for sheet_dto in self.excel.sheets:
                 sheet = wb[sheet_dto.sheet_name]
-                self.persist_exsh_meta(sheet_dto)
-                self.cache_exsh_meta_data(sheet.max_row, sheet.max_column, sheet_dto)
-                self.persist_sheet_raw_data(sheet, sheet_dto)
+                self.set_db_exsh_meta(sheet_dto)
+                self.set_cache_exsh_meta_data(
+                    sheet.max_row, sheet.max_column, sheet_dto
+                )
+                self.set_db_sheet_raw_data(sheet, sheet_dto)
         except Exception as e:
             # log.exception(e)
             log.error(f"{self.excel} 载入数据时发生错误")
         finally:
             wb.close()
 
-    def persist_exsh_meta(self, sheet_dto: SheetDTO) -> int:
+    def set_db_exsh_meta(self, sheet_dto: SheetDTO) -> int:
         """持久化存 ExcelSheet 元数据"""
         exsh_bo = ExcelSheetBO(
             excel=self.excel.excel_name,
@@ -49,20 +52,21 @@ class ExcelLoader(ExcelHandler):
         exsh_po = exsh_bo_map_po(exsh_bo)
         return self.db.upsert_exsh(exsh_po)
 
-    def cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
+    def set_cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
         """缓存元数据"""
         sheet_dto.max_row = max_row
         sheet_dto.max_col = max_col
         _d = self.excel.to_dict()
         self.cache.set(self.excel.excel_name, _d, self.CACHE_TBL)
 
+    # TODO 优化函数
     # def cache_worksheet_by_cols(
     #     self, sheet: Worksheet, lang_cols: dict[str, list[int]]
     # ):
     #     for lang, cols in lang_cols.items():
     #         pass
 
-    def persist_sheet_raw_data(self, sheet: Worksheet, sheet_dto: SheetDTO):
+    def set_db_sheet_raw_data(self, sheet: Worksheet, sheet_dto: SheetDTO):
         """持久化 Sheet 中的原始数据"""
         # 存 EXSH 中的数据
         max_row = sheet_dto.max_row
@@ -76,8 +80,7 @@ class ExcelLoader(ExcelHandler):
                 col = excel_col_alpha2num(col_alpha)
                 # 遍历每行
                 for row in range(sheet_dto.header_row + 1, max_row + 1):
-                    loc = f"{col_alpha}{row}"
-                    raw_text = sheet[loc].value
+                    raw_text = sheet.cell(row, col).value
                     cell_po = CellInfoPO(
                         exsh_id=exsh_po.id,
                         row=row,
