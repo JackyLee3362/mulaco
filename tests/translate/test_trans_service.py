@@ -15,7 +15,7 @@ app = AppBase()
 app.setup()
 cache = app.cache
 
-db = DbService("sqlite:///db/test.db", True)
+db = DbService("sqlite:///db/test.db")
 
 deepl = DeepLCli(cache)
 tencent = TencentCli(cache)
@@ -25,7 +25,7 @@ service = TranslateService(db, cache)
 service.register_service(deepl)
 service.register_service(tencent)
 service.register_service(mockcli)
-service.setup_config(langs_config)
+service.setup_lang_config(langs_config)
 
 
 def test_1_register_service():
@@ -45,7 +45,7 @@ def test_2_setup_languages():
     langs_config = LanguagesConfig.from_dict(d.translate.model)
     pprint(langs_config)
     #
-    service.setup_config(langs_config)
+    service.setup_lang_config(langs_config)
     pprint(service.dst_langs)
     pprint(service.lang_mapper)
 

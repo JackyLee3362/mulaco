@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 
 from mulaco.base import AppBase
 from mulaco.db.service import DbService
-from mulaco.excel.handler import ExcelLoader
+from mulaco.excel.loader import ExcelLoader
 from mulaco.excel.model import BatchExcel, SheetDTO
 
 
@@ -34,16 +34,16 @@ def test_handler_loader(handler: ExcelLoader):
     assert isinstance(sheet_dto, SheetDTO)
     db = handler.db
     pprint(db.get_all_exsh())
-    handler.persist_exsh_meta(sheet_dto)
+    handler.set_db_exsh_meta(sheet_dto)
     res = db.get_all_exsh()
     assert len(res) > 0
 
-    handler.cache_exsh_meta_data(89, 100, sheet_dto)
+    handler.set_cache_exsh_meta_data(89, 100, sheet_dto)
 
     # 持久化数据
     wb = load_workbook(handler.excel.src_path)
     sheet = wb[sheet_dto.sheet_name]
-    handler.persist_sheet_raw_data(sheet, sheet_dto)
+    handler.set_db_sheet_raw_data(sheet, sheet_dto)
 
     cells = db.get_all_cell_info()
     pprint(cells)
