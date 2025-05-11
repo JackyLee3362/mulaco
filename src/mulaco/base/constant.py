@@ -11,6 +11,11 @@ SRC_PATH = Path(__file__).parent.parent
 CWD_PATH = Path(os.getcwd())
 LOG_DIR_PATH = Path(os.getcwd()).joinpath("logs")
 CONFIG_DIR_PATH = Path(os.getcwd()).joinpath("config")
-SETTING_FILE_PATH = Path(os.getcwd()).joinpath("config", "settings.toml")
 DB_DIR_PATH = Path(os.getcwd()).joinpath("db")
-KVDB_PATH = Path(os.getcwd()).joinpath("db", "app.json")
+JSON_CACHE_PATH = Path(os.getcwd()).joinpath("db", "app.json")
+ENV = os.getenv("MULACO_ENV").lower()
+
+if ENV:
+    SETTING_FILE_PATH = Path(os.getcwd()).joinpath("config", f"settings.{ENV}.toml")
+else:
+    SETTING_FILE_PATH = Path(os.getcwd()).joinpath("config", "settings.toml")

@@ -6,6 +6,8 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from mulaco.base.db import JsonCache
 from mulaco.core.models import CellInfoBO, ExcelSheetBO
+from mulaco.db.mapper import exsh_bo_map_po
+from mulaco.db.models import CellInfoPO
 from mulaco.db.service import DbService
 from mulaco.excel.model import ExcelDTO, SheetDTO
 from mulaco.excel.utils import excel_col_alpha2num
@@ -14,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class ExcelHandler:
-    cache_tbl = "excels"
+    CACHE_TBL = "excels"
 
     def __init__(self, excel: ExcelDTO, db: DbService, cache: JsonCache):
         self.excel = excel
@@ -25,6 +27,12 @@ class ExcelHandler:
 class ExcelLoader(ExcelHandler):
 
     def loader(self):
+        """
+        TODO: 优化建议
+        在初始化的时候
+        把要的行和列读到缓存，再进行持久化操作，
+        否则一张表就要 1-2 分钟，很费时。
+        """
         if self.excel.skip:
             log.debug(f"{self.excel} 跳过")
             return
@@ -48,39 +56,53 @@ class ExcelLoader(ExcelHandler):
             sheet=sheet_dto.sheet_name,
             header=sheet_dto.header_row,
         )
-        return self.db.upsert_exsh(exsh_bo)
+        exsh_po = exsh_bo_map_po(exsh_bo)
+        return self.db.upsert_exsh(exsh_po)
 
     def cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
         """缓存元数据"""
         sheet_dto.max_row = max_row
         sheet_dto.max_col = max_col
         _d = self.excel.to_dict()
-        self.cache.set(self.excel.excel_name, _d, self.cache_tbl)
+        self.cache.set(self.excel.excel_name, _d, self.CACHE_TBL)
+
+    # def cache_worksheet_by_cols(
+    #     self, sheet: Worksheet, lang_cols: dict[str, list[int]]
+    # ):
+    #     for lang, cols in lang_cols.items():
+    #         pass
 
     def persist_sheet_raw_data(self, sheet: Worksheet, sheet_dto: SheetDTO):
         """持久化 Sheet 中的原始数据"""
         # 存 EXSH 中的数据
         max_row = sheet_dto.max_row
-        col_dto = sheet_dto.lang_cols
         ex_name = self.excel.excel_name
         sh_name = sheet_dto.sheet_name
-        exsh_bo = self.db.get_exsh_by_name(ExcelSheetBO(ex_name, sh_name, None))
+        exsh_po = self.db.get_exsh_by_name(ex_name, sh_name)
         # 遍历每个 languages 对象，一般来说是 zh 和 en
-        for col_dto in sheet_dto.lang_cols:
-            lang = col_dto.src_lang
+        for src_lang, col_list in sheet_dto.lang_cols.items():
             # 遍历每个 col
-            for col_alpha in col_dto.cols:
+            for col_alpha in col_list:
                 col = excel_col_alpha2num(col_alpha)
                 # 遍历每行
                 for row in range(sheet_dto.header_row + 1, max_row + 1):
                     loc = f"{col_alpha}{row}"
                     raw_text = sheet[loc].value
-                    cell = CellInfoBO(
-                        row=row, col=col, src_lang=lang, raw_text=raw_text, exsh=exsh_bo
+                    cell_po = CellInfoPO(
+                        exsh_id=exsh_po.id,
+                        row=row,
+                        col=col,
+                        src_lang=src_lang,
+                        raw_text=raw_text,
+                        # 这里 post_text 需要抽象出来一个方法
+                        # 且不一定是在这个位置处理
+                        proc_text=raw_text,
                     )
-                    self.db.upsert_cell(cell)
+                    self.db.upsert_cell(cell_po)
+                log.debug(f"已处理 {ex_name}.{sh_name} 的 {col_alpha} 列")
 
 
 class ExcelExporter(ExcelHandler):
 
-    def writer(self): ...
+    def writer(self):
+        pass

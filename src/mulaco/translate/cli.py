@@ -273,3 +273,42 @@ class TencentCli(TranslateCli):
 
     def api_delete_glossary(self, src, dst):
         return super().api_delete_glossary(src, dst)
+
+
+class MockCli(TranslateCli):
+    name = "mock-cli"
+    CACHE_TBL = "mock-cache"
+
+    def __init__(self, cache: JsonCache):
+        self.langs = {
+            "en": "英语",
+            "zh": "简中",
+            "de": "德语",
+            "fr": "法语",
+            "ru": "俄语",
+            "th": "泰语",
+            "jp": "日语",
+            "ko": "韩语",
+            "it": "意大利语",
+            "pt": "葡萄牙语",
+            "es": "西班牙语",
+        }
+        super().__init__()
+
+    def api_translate_text(self, src, dst, text):
+        src_lang = self.langs.get(src, "未知src")
+        dst_lang = self.langs.get(dst, "未知dst")
+        res = f"{src_lang}-{dst_lang}({text})"
+        return res
+
+    def api_create_glossary(self, src, dst, entries):
+        return super().api_create_glossary(src, dst, entries)
+
+    def api_get_glossary(self, src, dst):
+        return super().api_get_glossary(src, dst)
+
+    def api_list_glossaries(self):
+        return super().api_list_glossaries()
+
+    def api_delete_glossary(self, src, dst):
+        return super().api_delete_glossary(src, dst)

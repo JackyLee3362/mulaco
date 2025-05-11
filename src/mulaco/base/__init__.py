@@ -1,4 +1,4 @@
-from mulaco.base.constant import KVDB_PATH, LOG_DIR_PATH, SETTING_FILE_PATH
+from mulaco.base.constant import SETTING_FILE_PATH
 from mulaco.base.db import JsonCache
 from mulaco.base.logger import set_logger
 from mulaco.base.settings import TomlConfig

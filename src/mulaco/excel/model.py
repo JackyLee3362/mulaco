@@ -10,16 +10,9 @@ from dataclasses_json import dataclass_json
 
 # @dataclass_json
 @dataclass
-class LangColumns:
-    src_lang: str
-    cols: list[str]
-
-
-# @dataclass_json
-@dataclass
 class SheetDTO:
     sheet_name: str
-    lang_cols: list[LangColumns]
+    lang_cols: dict[str, list[str]]
     header_row: int = field(repr=False)
     max_row: int = field(init=False, repr=False, default=0)
     max_col: int = field(init=False, repr=False, default=0)  # index 从 1 开始
