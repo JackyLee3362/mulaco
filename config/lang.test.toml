@@ -1,0 +1,64 @@
+# 语言配置
+[[translate.model.langs]]
+name = '简中'
+code = 'zh'
+active = false
+
+[[translate.model.langs]]
+name = '英语'
+code = 'en'
+active = false
+
+[[translate.model.langs]]
+name = '日语'
+code = 'jp'
+active = false
+
+[[translate.model.langs]]
+name = '德语'
+code = 'de'
+offset = 1
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '韩语'
+code = 'ko'
+offset = 2
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '泰语'
+code = 'th'
+offset = 3
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '俄语'
+code = 'ru'
+offset = 4
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '西班牙语'
+code = 'es'
+offset = 5
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = 'fr'
+code = 'fr'
+desc = '法语'
+offset = 6
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '葡萄牙语'
+code = 'pt'
+offset = 7
+service_name = "mock-cli"
+
+[[translate.model.langs]]
+name = '意大利语'
+code = 'it'
+offset = 8
+service_name = "mock-cli"
