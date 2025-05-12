@@ -2,12 +2,11 @@ from pprint import pprint
 
 import tomllib
 
-from mulaco.base import AppBase
+from mulaco.base.scaffold import Scaffold
 from mulaco.translate.cli import LocalCli
 
 my_dict = "config/dict.toml"
-app = AppBase()
-app.setup()
+app = Scaffold()
 cache = app.cache
 local_api = LocalCli(cache)
 

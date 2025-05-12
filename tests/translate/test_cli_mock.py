@@ -1,18 +1,19 @@
 from pprint import pprint
 
-from mulaco.base import AppBase
+import tomllib
+
+from mulaco.base.scaffold import Scaffold
 from mulaco.base.settings import TomlConfig
 from mulaco.db.service import DbService
+from mulaco.models.config_model import BatchExcelVO, ExcelVO, LanguagesVO
 from mulaco.translate.cli import DeepLCli, MockCli, TencentCli
-from mulaco.translate.model import LanguagesConfig
 from mulaco.translate.service import TranslateService
 
 lang_model_path = "config/lang.test.toml"
 d = TomlConfig(lang_model_path)
-langs_config = LanguagesConfig.from_dict(d.translate.model)
+langs_config = LanguagesVO.from_dict(d.translate.model)
 
-app = AppBase()
-app.setup()
+app = Scaffold()
 cache = app.cache
 
 db = DbService("sqlite:///db/test.db")
@@ -42,7 +43,7 @@ def test_2_setup_languages():
     service.register_service(tencent)
     # 装配 lang
     pprint(d.translate.model)
-    langs_config = LanguagesConfig.from_dict(d.translate.model)
+    langs_config = LanguagesVO.from_dict(d.translate.model)
     pprint(langs_config)
     #
     service.setup_lang_config(langs_config)
@@ -51,7 +52,17 @@ def test_2_setup_languages():
 
 
 def test_translate_lang():
-    excel_name = "ClothingConfig.xlsx"
-    src = "en"
-    res = service.translate_excel_src(excel_name, src)
+    config_file = "config/batch1.toml"
+    d = tomllib.load(open(config_file, "rb"))
+
+    # 从 config 加载的数据
+    eb = BatchExcelVO.from_dict(d)
+    excel_dto = eb.excels[0]
+
+    # 从缓存中更新数据
+    excel_d = ExcelVO.to_dict(excel_dto)
+    cache_d = app.cache.get(excel_dto.excel_name, "excels")
+    excel_d.update(cache_d)
+    excel_dto = ExcelVO.from_dict(excel_d)
+    res = service.translate_excel(excel_dto, "en")
     pprint(res)

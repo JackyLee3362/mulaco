@@ -3,12 +3,11 @@ from pprint import pprint
 
 from pytest_mock import MockerFixture
 
-from mulaco.base import AppBase
+from mulaco.base.scaffold import Scaffold
 from mulaco.translate.cli import DeepLCli
 
 my_dict = "config/dict.json"
-app = AppBase()
-app.setup()
+app = Scaffold()
 cache = app.cache
 deepl_api = DeepLCli(cache)
 

@@ -3,26 +3,25 @@ import tomllib
 
 from mulaco.base.scaffold import Scaffold
 from mulaco.db.service import DbService
-from mulaco.excel.loader import ExcelLoader
+from mulaco.fix.pre_fix import ExcelPreFixer
 from mulaco.models.config_model import BatchExcelVO
 
 
 @pytest.fixture(scope="module")
-def handler():
-
-    app_base = Scaffold()
-    cache = app_base.cache
+def fixer() -> ExcelPreFixer:
 
     db = DbService("sqlite:///db/test.db")
+    app = Scaffold()
+    cache = app.cache
 
-    yield ExcelLoader(db, cache)
+    fixer = ExcelPreFixer(db, cache)
+    return fixer
 
 
-def test_handler_loader(handler: ExcelLoader):
-    """测试构造并生成数据"""
+def test_pre_fix(fixer: ExcelPreFixer):
     config_file = "config/batch1.toml"
     d = tomllib.load(open(config_file, "rb"))
-    be = BatchExcelVO.from_dict(d)
-    excel = be.excels[0]
+    eb = BatchExcelVO.from_dict(d)
+    excel = eb.excels[0]
 
-    handler.load_excel(excel)
+    fixer.pre_fix_excel(excel)
