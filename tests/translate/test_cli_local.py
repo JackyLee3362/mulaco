@@ -1,18 +1,18 @@
 from pprint import pprint
 
-import tomllib
+import pytest
 
-from mulaco.base.scaffold import Scaffold
+from mulaco.core.app import App
 from mulaco.translate.cli import LocalCli
 
-my_dict = "config/dict.toml"
-app = Scaffold()
-cache = app.cache
-local_api = LocalCli(cache)
+
+@pytest.fixture(scope="module")
+def local_cli(app: App):
+    return LocalCli(app)
 
 
-def test_my_dict():
-    d = tomllib.load(open(my_dict, "rb"))
-    local_api.load_dict_glossary(d)
-    ds = local_api.api_list_glossaries()
+def test_my_dict(app, local_cli: LocalCli):
+    d = app.user_dict
+    local_cli.load_dict_glossary(d)
+    ds = local_cli.api_list_glossaries()
     pprint(ds)

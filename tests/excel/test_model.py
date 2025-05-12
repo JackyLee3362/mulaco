@@ -5,7 +5,7 @@ import pytest
 import tomllib
 
 from mulaco.base.scaffold import Scaffold
-from mulaco.models.config_model import BatchExcelVO, ExcelVO, SheetVO
+from mulaco.models.dto_model import BatchExcelDTO, ExcelDTO, SheetDTO
 
 app = Scaffold()
 
@@ -17,7 +17,7 @@ def test_load_config():
 
 def test_map_dict():
     d = tomllib.load(open("config/batch1.toml", "rb"))
-    BatchExcelVO.from_dict(d)
+    BatchExcelDTO.from_dict(d)
 
 
 def test_cache_config():
@@ -28,7 +28,7 @@ def test_cache_config():
     pprint(d)
     mtime = int(os.stat(config_file).st_mtime)
     print("修改时间", mtime)
-    eb = BatchExcelVO.from_dict(d)
+    eb = BatchExcelDTO.from_dict(d)
     res = app.cache.get("excel-info", config_file)
     if res is None or res["modify_time"] < mtime:
         print("需要新增")
@@ -42,5 +42,5 @@ def test_cache_config():
 def test_cache_to_model():
     CACHE_EXCEL_TBL = "excels"
     d = app.cache.get("ClothingConfig.xlsx", CACHE_EXCEL_TBL)
-    res = ExcelVO.from_dict(d)
+    res = ExcelDTO.from_dict(d)
     print(res)

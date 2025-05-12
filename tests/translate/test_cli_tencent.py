@@ -1,14 +1,13 @@
 from pprint import pprint
-
-from mulaco.base.scaffold import Scaffold
+import pytest
 from mulaco.translate.cli import TencentCli
 
-my_dict = "config/dict.json"
-app = Scaffold()
-cache = app.cache
-tencent_api = TencentCli(cache)
+
+@pytest.fixture(scope="module")
+def tencent_api(app):
+    return TencentCli(app)
 
 
-def test_1():
+def test_1(tencent_api: TencentCli):
     res = tencent_api.api_translate_text("en", "zh", "hello, world")
     pprint(res)

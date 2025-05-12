@@ -1,28 +1,14 @@
 import pytest
-import tomllib
 
-from mulaco.base.scaffold import Scaffold
-from mulaco.db.service import DbService
+from mulaco.core.app import App
 from mulaco.excel.loader import ExcelLoader
-from mulaco.models.config_model import BatchExcelVO
 
 
 @pytest.fixture(scope="module")
-def handler():
-
-    app_base = Scaffold()
-    cache = app_base.cache
-
-    db = DbService("sqlite:///db/test.db")
-
-    yield ExcelLoader(db, cache)
+def loader(app):
+    return ExcelLoader(app)
 
 
-def test_handler_loader(handler: ExcelLoader):
-    """测试构造并生成数据"""
-    config_file = "config/batch1.toml"
-    d = tomllib.load(open(config_file, "rb"))
-    be = BatchExcelVO.from_dict(d)
-    excel = be.excels[0]
-
-    handler.load_excel(excel)
+def test_loader_load(app: App, loader: ExcelLoader):
+    excel = app.batch_excels.excels[0]
+    loader.load_excel(excel)

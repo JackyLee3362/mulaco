@@ -10,8 +10,8 @@ from mulaco.db.sql import (
     build_sql_get_all_write_trans,
     build_sql_get_not_proc_cells,
 )
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.config_model import BatchExcelVO
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.dto_model import BatchExcelDTO
 
 
 @pytest.fixture(scope="module")
@@ -25,7 +25,7 @@ def excel() -> ExcelSheetBO:
 
     config_file = "config/batch1.toml"
     d = tomllib.load(open(config_file, "rb"))
-    eb = BatchExcelVO.from_dict(d)
+    eb = BatchExcelDTO.from_dict(d)
     excel = eb.excels[0]
     sheet = excel.sheets[0]
     exsh = ExcelSheetBO(excel.excel_name, sheet.sheet_name, sheet.header_row)

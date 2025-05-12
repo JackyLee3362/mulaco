@@ -1,31 +1,33 @@
 import types
 from pprint import pprint
 
-from pytest_mock import MockerFixture
+import pytest
 
-from mulaco.base.scaffold import Scaffold
+# from pytest_mock import MockerFixture
 from mulaco.translate.cli import DeepLCli
 
-my_dict = "config/dict.json"
-app = Scaffold()
-cache = app.cache
-deepl_api = DeepLCli(cache)
+
+@pytest.fixture(scope="module")
+def deepl_cli(cache):
+    return DeepLCli(cache)
 
 
-def test_translate():
-    res = deepl_api.api_translate_text("en", "zh", "hello, world")
-    pprint(res)
+def test_translate(deepl_cli: DeepLCli):
+    res = deepl_cli.api_translate_text("en", "zh", "hello, world")
+    print(res)
+    assert "hello" not in res
+    assert "world" not in res
 
 
-def test_2_create_glossary(mocker: MockerFixture):
+def test_2_create_glossary(mocker, deepl_cli: DeepLCli):
     class MockRes: ...
 
-    f = deepl_api.cli.create_glossary
+    f = deepl_cli.cli.create_glossary
     full_name = get_func_name(f)
     val = MockRes()
     val.glossary_id = "abc"
-    # mocker.patch(full_name, return_value=val)
-    res = deepl_api.api_create_glossary(
+    mocker.patch(full_name, return_value=val)
+    res = deepl_cli.api_create_glossary(
         "en", "zh", {"hello": "你~好~", "world": "世~界~"}
     )
     print(res)
@@ -40,15 +42,15 @@ def get_func_name(method):
     return f"{module_name}.{qualified_name}"
 
 
-def test_2_list_sync():
-    ds = deepl_api.api_list_glossaries(sync=True)
+def test_2_list_sync(deepl_cli: DeepLCli):
+    ds = deepl_cli.api_list_glossaries(sync=True)
     for item in ds:
         print(item.glossary_id)
 
 
-def test_get_glossary():
-    deepl_api.api_get_glossary("en", "zh")
+def test_get_glossary(deepl_cli: DeepLCli):
+    deepl_cli.api_get_glossary("en", "zh")
 
 
-def test_3_del_glossary():
-    deepl_api.api_delete_glossary("en", "zh")
+def test_3_del_glossary(deepl_cli: DeepLCli):
+    deepl_cli.api_delete_glossary("en", "zh")
