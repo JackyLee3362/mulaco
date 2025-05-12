@@ -12,12 +12,16 @@ date_fmt = "%Y-%m-%d %H:%M:%S"
 fmt = "[%(asctime)s] %(name)s - %(levelname)-8s %(funcName)s  : %(message)s"
 
 [app.db]
-url = "sqlite://db/app.test.db"
+url = "sqlite:///db/app.test.db"
+echo = false
 
 [app.cache]
-url = "db/cache.test.json"
+url = "db/cache.json"
+
+[app.excel]
+excel_conf_url = "config/batch1.toml"
 
 [app.translate]
 # 相对路径
-lang_url = "config/lang.test.toml"
-dict_url = "config/dict.toml"
+lang_conf_url = "config/lang.test.toml"
+dict_url = "config/user_dict.test.toml"

@@ -17,9 +17,10 @@ url = "sqlite://db/app.db"
 [app.cache]
 url = "db/cache.json"
 
+[app.excel]
+excel_conf_url = "config/batch1.toml"
+
 [app.translate]
 # 相对路径
-lang_url = "config/lang.toml"
+lang_conf_url = "config/lang.toml"
 dict_url = "config/dict.toml"
-
-
