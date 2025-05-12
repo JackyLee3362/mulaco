@@ -280,25 +280,11 @@ class MockCli(TranslateCli):
     CACHE_TBL = "mock-cache"
 
     def __init__(self, cache: JsonCache):
-        self.langs = {
-            "en": "英语",
-            "zh": "简中",
-            "de": "德语",
-            "fr": "法语",
-            "ru": "俄语",
-            "th": "泰语",
-            "jp": "日语",
-            "ko": "韩语",
-            "it": "意大利语",
-            "pt": "葡萄牙语",
-            "es": "西班牙语",
-        }
+        self.cache = cache
         super().__init__()
 
     def api_translate_text(self, src, dst, text):
-        src_lang = self.langs.get(src, "未知src")
-        dst_lang = self.langs.get(dst, "未知dst")
-        res = f"{src_lang}-{dst_lang}({text})"
+        res = f"trans-{src}-{dst}({text})"
         return res
 
     def api_create_glossary(self, src, dst, entries):

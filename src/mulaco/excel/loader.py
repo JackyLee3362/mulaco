@@ -1,63 +1,71 @@
 import logging
 
-import xlwings as xw
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from mulaco.core.models import CellInfoBO, ExcelSheetBO
+from mulaco.base.db import JsonCache
 from mulaco.db.mapper import exsh_bo_map_po
-from mulaco.db.models import CellInfoPO
-from mulaco.excel.base_handler import ExcelHandler
-from mulaco.excel.model import SheetDTO
+from mulaco.db.service import DbService
 from mulaco.excel.utils import excel_col_alpha2num
+from mulaco.models.business_model import ExcelSheetBO
+from mulaco.models.config_model import ExcelVO, SheetVO
+from mulaco.models.db_model import CellInfoPO
 
 log = logging.getLogger(__name__)
 
 
-class ExcelLoader(ExcelHandler):
+class ExcelLoader:
+    CACHE_TBL = "excels"
     # -------------------- loader --------------------
 
-    def loader(self):
+    def __init__(self, db: DbService, cache: JsonCache):
+        self.db = db
+        self.cache = cache
+
+    def load_excel(self, excel: ExcelVO):
         """
         TODO: 优化建议
         在初始化的时候
         把要的行和列读到缓存，再进行持久化操作，
         否则一张表就要 1-2 分钟，很费时。
         """
-        if self.excel.skip:
-            log.debug(f"{self.excel} 跳过")
+        if excel.skip:
+            log.debug(f"{excel} 跳过")
             return
         try:
-            wb = load_workbook(self.excel.src_path)
-            for sheet_dto in self.excel.sheets:
+            wb = load_workbook(excel.src_path)
+            ex_name = excel.excel_name
+            for sheet_dto in excel.sheets:
                 sheet = wb[sheet_dto.sheet_name]
-                self.set_db_exsh_meta(sheet_dto)
-                self.set_cache_exsh_meta_data(
-                    sheet.max_row, sheet.max_column, sheet_dto
+                self._set_db_exsh_meta(ex_name, sheet_dto)
+                self._set_cache_exsh_meta_data(
+                    sheet.max_row, sheet.max_column, excel, sheet_dto
                 )
-                self.set_db_sheet_raw_data(sheet, sheet_dto)
-        except Exception as e:
+                self._set_db_sheet_raw_data(ex_name, sheet, sheet_dto)
+        except Exception:
             # log.exception(e)
-            log.error(f"{self.excel} 载入数据时发生错误")
+            log.error(f"{ex_name} 载入数据时发生错误")
         finally:
             wb.close()
 
-    def set_db_exsh_meta(self, sheet_dto: SheetDTO) -> int:
+    def _set_db_exsh_meta(self, excel_name: str, sheet_dto: SheetVO) -> int:
         """持久化存 ExcelSheet 元数据"""
         exsh_bo = ExcelSheetBO(
-            excel=self.excel.excel_name,
+            excel=excel_name,
             sheet=sheet_dto.sheet_name,
             header=sheet_dto.header_row,
         )
         exsh_po = exsh_bo_map_po(exsh_bo)
         return self.db.upsert_exsh(exsh_po)
 
-    def set_cache_exsh_meta_data(self, max_row: int, max_col: int, sheet_dto: SheetDTO):
+    def _set_cache_exsh_meta_data(
+        self, max_row: int, max_col: int, excel_dto: ExcelVO, sheet_dto: SheetVO
+    ):
         """缓存元数据"""
         sheet_dto.max_row = max_row
         sheet_dto.max_col = max_col
-        _d = self.excel.to_dict()
-        self.cache.set(self.excel.excel_name, _d, self.CACHE_TBL)
+        _d = excel_dto.to_dict()
+        self.cache.set(excel_dto.excel_name, _d, self.CACHE_TBL)
 
     # TODO 优化函数
     # def cache_worksheet_by_cols(
@@ -66,11 +74,12 @@ class ExcelLoader(ExcelHandler):
     #     for lang, cols in lang_cols.items():
     #         pass
 
-    def set_db_sheet_raw_data(self, sheet: Worksheet, sheet_dto: SheetDTO):
+    def _set_db_sheet_raw_data(
+        self, ex_name: str, sheet: Worksheet, sheet_dto: SheetVO
+    ):
         """持久化 Sheet 中的原始数据"""
         # 存 EXSH 中的数据
         max_row = sheet_dto.max_row
-        ex_name = self.excel.excel_name
         sh_name = sheet_dto.sheet_name
         exsh_po = self.db.get_exsh_by_name(ex_name, sh_name)
         # 遍历每个 languages 对象，一般来说是 zh 和 en
@@ -87,9 +96,6 @@ class ExcelLoader(ExcelHandler):
                         col=col,
                         src_lang=src_lang,
                         raw_text=raw_text,
-                        # 这里 post_text 需要抽象出来一个方法
-                        # 且不一定是在这个位置处理
-                        proc_text=raw_text,
                     )
                     self.db.upsert_cell(cell_po)
                 log.debug(f"已处理 {ex_name}.{sh_name} 的 {col_alpha} 列")
