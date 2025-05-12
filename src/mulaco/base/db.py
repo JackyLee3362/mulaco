@@ -11,14 +11,13 @@ class JsonCache:
     使用 json 文件存储，方便直接修改
     """
 
-    def __init__(self, db_url: str):
-        self.db_url = db_url
+    def __init__(self, cache_url: str):
         log.debug("连接数据库")
-        self.db = TinyDB(db_url)
+        self.cache = TinyDB(cache_url)
         self.query = Query()
 
     def set(self, key: str, value: str | dict, tbl: str = None):
-        table = self.db.table(tbl) if tbl else self.db
+        table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:
             log.debug("数据已存在，更新键")
@@ -28,7 +27,7 @@ class JsonCache:
             table.insert({"key": key, "val": value})
 
     def get(self, key: str, tbl: str = None, default: str | dict | list = None):
-        table = self.db.table(tbl) if tbl else self.db
+        table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:
             log.debug("数据存在，直接返回")
@@ -37,9 +36,9 @@ class JsonCache:
         return default
 
     def get_all(self, tbl: str = None):
-        table = self.db.table(tbl) if tbl else self.db
+        table = self.cache.table(tbl) if tbl else self.cache
         return table.all()
 
     def close(self):
         log.debug("关闭数据库")
-        self.db.close()
+        self.cache.close()

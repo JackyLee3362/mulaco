@@ -10,8 +10,9 @@ from mulaco.db.sql import (
     build_sql_get_all_write_trans,
     build_sql_get_not_proc_cells,
 )
-from mulaco.models.business_model import ExcelSheetBO, TransInfoBO
-from mulaco.models.db_model import Base, CellInfoPO, ExcelSheetPO, TransInfoPO
+from mulaco.models.bo_model import ExcelSheetBO, TransInfoBO
+from mulaco.models.mapper import exsh_bo_map_po
+from mulaco.models.po_model import Base, CellInfoPO, ExcelSheetPO, TransInfoPO
 
 log = logging.getLogger(__name__)
 
@@ -65,8 +66,12 @@ class DbService:
             # log.exception(e)
             self.session.rollback()
 
+    # TODO 其实入参应该是 DTO，返回结果也是 DTO
+    # 且 DTO 在设计时应该有 id
+    # 我的里面是没有的，所以需要改进
     def upsert_exsh(self, po: ExcelSheetPO) -> int:
         try:
+            # po = exsh_bo_map_po(po)
             old_po = self.exsh_repo.get_exsh_by_uk(po.excel, po.sheet)
             # 更新
             if old_po:

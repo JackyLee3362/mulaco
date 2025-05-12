@@ -5,11 +5,10 @@ from pathlib import Path
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from mulaco.base.db import JsonCache
-from mulaco.db.service import DbService
+from mulaco.core.app import App
 from mulaco.excel.utils import excel_col_alpha2num
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.config_model import ExcelVO, LanguagesVO, LanguageVO, SheetVO
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.dto_model import ExcelDTO, SheetDTO
 
 log = logging.getLogger(__name__)
 
@@ -18,29 +17,17 @@ class ExcelExporter:
     CACHE_EXCEL_TBL = "excels"
 
     # TODO 这里的参数是传 excel_name 还是传 excel_dto 呢
-    def __init__(self, db: DbService, cache: JsonCache):
-        self.db = db
-        self.cache = cache
-
-    def setup_lang_config(self, langs_config: LanguagesVO):
-        """配置待翻译语言
-        TODO 感觉这里和 translate.service 中的代码重复，是否可以提取优化
-        """
-        self.dst_langs: list[str] = None
-        self.lang_mapper: dict[str, LanguageVO] = {}
-        dst_langs: list[LanguageVO] = []
-        for lang in langs_config.langs:
-            # 默认加入
-            self.lang_mapper[lang.code] = lang
-            # 如果激活该语言，则寻找对应服务
-            if lang.active:
-                dst_langs.append(lang)
-        self.dst_langs = sorted(dst_langs, key=lambda x: x.offset)
+    def __init__(self, app: App):
+        self.db = app.db
+        self.cache = app.cache
+        self.dst_langs = app.dst_langs
+        self.langs_mapper = app.langs_mapper
 
     # -------------------- export --------------------
-    def export_excel(self, excel: ExcelVO):
+    def export_excel(self, excel: ExcelDTO):
         if excel.skip:
             log.debug(f"{excel.excel_name} 跳过")
+        excel = self.flush_excel(excel)
         try:
             # 第一步，复制数据
             self._copy_excel(excel)
@@ -52,46 +39,49 @@ class ExcelExporter:
 
             # 保存
             wb.save(excel.dst_path)
-        except Exception as e:
+        except Exception:
             log.error(f"{excel.excel_name} 写入数据时发送错误")
         finally:
             wb.close()
 
+    def flush_excel(self, excel_dto: ExcelDTO) -> ExcelDTO:
+        d = self.cache.get(excel_dto.excel_name, self.CACHE_EXCEL_TBL)
+        return ExcelDTO.from_dict(d)
+
     def write_sheet(
-        self, excel: ExcelVO, sheet: Worksheet, sheet_dto: SheetVO, src: str
+        self, ex_dto: ExcelDTO, sheet: Worksheet, sh_dto: SheetDTO, src: str
     ):
         """TODO 优化建议，直接将准备好的数据批量写入"""
         # db 选择行
-        ex_name = excel.excel_name
-        sh_name = sheet_dto.sheet_name
-        max_col = sheet_dto.max_col
-        header_row = sheet_dto.header_row
+        ex_name = ex_dto.excel_name
+        sh_name = sh_dto.sheet_name
+        max_col = sh_dto.max_col
+        header_row = sh_dto.header_row
         #
         exsh_bo = ExcelSheetBO(excel=ex_name, sheet=sh_name, header=None)
-        cols = sheet_dto.lang_cols[src]
+        cols = sh_dto.lang_cols[src]
         total_dst_lang = len(self.dst_langs)
         for idx, src_col in enumerate(cols):
             # 主要是标记
             # idx 主要是标记序号的
             col_num = excel_col_alpha2num(src_col)
-            for dst_lang_obj in self.dst_langs:
+            for dst in self.dst_langs:
                 # TODO 从 Lang 模型中提取 offset 或者，可以在设置 lang 时设置
-                dst_code = dst_lang_obj.code
-                offset = self.lang_mapper[dst_code].offset
-                res = self.db.get_all_write_trans(exsh_bo, src, dst_code, col_num)
+                offset = self.langs_mapper[dst].order
+                res = self.db.get_all_write_trans(exsh_bo, src, dst, col_num)
                 # 计算列
                 d_col = max_col + offset + total_dst_lang * idx
                 # TODO 写入表头
-                header_text = src_col + "列" + self.lang_mapper[dst_code].name
+                header_text = src_col + "列" + self.langs_mapper[dst].name
                 sheet.cell(header_row, d_col).value = header_text
 
                 for cell_po, trans_po in res:
                     c_row = cell_po.row
                     text = trans_po.write_text
                     sheet.cell(c_row, d_col).value = text
-                log.debug(f"完成 {ex_name}.{sh_name} lang={dst_code} 中的写入")
+                log.debug(f"完成 {ex_name}.{sh_name} lang={dst} 中的写入")
 
-    def _copy_excel(self, excel: ExcelVO):
+    def _copy_excel(self, excel: ExcelDTO):
         """复制文件到指定位置，如果存在，直接返回"""
         src = Path(excel.src_path)
         dst = Path(excel.dst_path)

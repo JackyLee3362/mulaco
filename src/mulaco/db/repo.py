@@ -4,7 +4,7 @@ from typing import Generic, List, TypeVar
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mulaco.models.db_model import CellInfoPO, ExcelSheetPO, TransInfoPO
+from mulaco.models.po_model import CellInfoPO, ExcelSheetPO, TransInfoPO
 
 log = logging.getLogger(__name__)
 

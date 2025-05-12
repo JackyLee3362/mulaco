@@ -3,13 +3,12 @@ import logging
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from mulaco.base.db import JsonCache
-from mulaco.db.mapper import exsh_bo_map_po
-from mulaco.db.service import DbService
+from mulaco.core.app import App
 from mulaco.excel.utils import excel_col_alpha2num
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.config_model import ExcelVO, SheetVO
-from mulaco.models.db_model import CellInfoPO
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.dto_model import ExcelDTO, SheetDTO
+from mulaco.models.mapper import exsh_bo_map_po
+from mulaco.models.po_model import CellInfoPO
 
 log = logging.getLogger(__name__)
 
@@ -18,11 +17,11 @@ class ExcelLoader:
     CACHE_TBL = "excels"
     # -------------------- loader --------------------
 
-    def __init__(self, db: DbService, cache: JsonCache):
-        self.db = db
-        self.cache = cache
+    def __init__(self, app: App):
+        self.db = app.db
+        self.cache = app.cache
 
-    def load_excel(self, excel: ExcelVO):
+    def load_excel(self, excel: ExcelDTO):
         """
         TODO: 优化建议
         在初始化的时候
@@ -48,7 +47,7 @@ class ExcelLoader:
         finally:
             wb.close()
 
-    def _set_db_exsh_meta(self, excel_name: str, sheet_dto: SheetVO) -> int:
+    def _set_db_exsh_meta(self, excel_name: str, sheet_dto: SheetDTO) -> int:
         """持久化存 ExcelSheet 元数据"""
         exsh_bo = ExcelSheetBO(
             excel=excel_name,
@@ -59,7 +58,7 @@ class ExcelLoader:
         return self.db.upsert_exsh(exsh_po)
 
     def _set_cache_exsh_meta_data(
-        self, max_row: int, max_col: int, excel_dto: ExcelVO, sheet_dto: SheetVO
+        self, max_row: int, max_col: int, excel_dto: ExcelDTO, sheet_dto: SheetDTO
     ):
         """缓存元数据"""
         sheet_dto.max_row = max_row
@@ -75,7 +74,7 @@ class ExcelLoader:
     #         pass
 
     def _set_db_sheet_raw_data(
-        self, ex_name: str, sheet: Worksheet, sheet_dto: SheetVO
+        self, ex_name: str, sheet: Worksheet, sheet_dto: SheetDTO
     ):
         """持久化 Sheet 中的原始数据"""
         # 存 EXSH 中的数据

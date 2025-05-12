@@ -1,8 +1,8 @@
 # 一些复杂 sql 语句
 from sqlalchemy import Select, select
 
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.db_model import CellInfoPO, ExcelSheetPO, TransInfoPO
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.po_model import CellInfoPO, ExcelSheetPO, TransInfoPO
 
 
 def build_sql_get_all_not_translated_cells(
@@ -85,7 +85,7 @@ def build_sql_get_all_not_proc_trans(
         select(ExcelSheetPO, CellInfoPO, TransInfoPO)
         # Inner Join 连接
         .join(CellInfoPO, CellInfoPO.exsh_id == ExcelSheetPO.id).join(
-            TransInfoPO, ExcelSheetPO.id == CellInfoPO.exsh_id
+            TransInfoPO, TransInfoPO.cell_id == CellInfoPO.id
         )
         # Exsh 约束
         .where(

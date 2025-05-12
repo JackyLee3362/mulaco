@@ -1,22 +1,21 @@
 # 翻译修复
 import logging
 
-from mulaco.base.db import JsonCache
-from mulaco.db.service import DbService
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.config_model import ExcelVO
-from mulaco.models.db_model import CellInfoPO
+from mulaco.core.app import App
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.dto_model import ExcelDTO
+from mulaco.models.po_model import CellInfoPO
 
 log = logging.getLogger(__name__)
 
 
 class ExcelPreFixer:
 
-    def __init__(self, db: DbService, cache: JsonCache):
-        self.db = db
-        self.cache = cache
+    def __init__(self, app: App):
+        self.db = app.db
+        self.cache = app.cache
 
-    def pre_fix_excel(self, excel: ExcelVO):
+    def pre_fix_excel(self, excel: ExcelDTO):
         ex_name = excel.excel_name
         for sheet in excel.sheets:
             sh_name = sheet.sheet_name

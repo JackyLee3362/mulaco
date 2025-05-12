@@ -1,47 +1,32 @@
 # 翻译修复
 import logging
 
-from mulaco.base.db import JsonCache
-from mulaco.db.service import DbService
-from mulaco.models.business_model import ExcelSheetBO
-from mulaco.models.config_model import ExcelVO, LanguagesVO, LanguageVO
-from mulaco.models.db_model import TransInfoPO
+from mulaco.core.app import App
+from mulaco.models.bo_model import ExcelSheetBO
+from mulaco.models.dto_model import ExcelDTO
+from mulaco.models.po_model import TransInfoPO
 
 log = logging.getLogger(__name__)
 
 
 class ExcelPostFixer:
 
-    def __init__(self, db: DbService, cache: JsonCache):
-        self.db = db
-        self.cache = cache
+    def __init__(self, app: App):
+        self.db = app.db
+        self.cache = app.cache
+        self.dst_langs = app.dst_langs
 
-    def setup_lang_config(self, langs_config: LanguagesVO):
-        """配置待翻译语言
-        TODO 感觉这里和 translate.service 中的代码重复，是否可以提取优化
-        """
-        self.lang_mapper: dict[str, LanguageVO] = {}
-        dst_langs: list[LanguageVO] = []
-        for lang in langs_config.langs:
-            # 默认加入
-            self.lang_mapper[lang.code] = lang
-            # 如果激活该语言，则寻找对应服务
-            if lang.active:
-                dst_langs.append(lang)
-        self.dst_langs = sorted(dst_langs, key=lambda x: x.offset)
-
-    def post_fix_excel(self, excel: ExcelVO):
+    def post_fix_excel(self, excel: ExcelDTO):
         ex_name = excel.excel_name
         for sheet in excel.sheets:
             sh_name = sheet.sheet_name
             bo = ExcelSheetBO(
-                excel.excel_name, sheet=sheet.sheet_name, header=sheet.header_row
+                excel=excel.excel_name, sheet=sheet.sheet_name, header=sheet.header_row
             )
             # 获取所有没有处理过的 cell (sheet 层面)
-            for dst_lang_obj in self.dst_langs:
-                dst_code = dst_lang_obj.code
+            for dst in self.dst_langs:
                 # TODO 配置 src
-                res = self.db.get_all_not_processed_trans(bo, "en", dst_code, None)
+                res = self.db.get_all_not_processed_trans(bo, "en", dst, None)
                 for ex_po, cell_po, trans_po in res:
                     trans_po: TransInfoPO
                     text = trans_po.trans_text

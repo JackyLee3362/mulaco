@@ -3,14 +3,15 @@ from __future__ import annotations
 from logging import getLogger
 
 from mulaco.base.db import JsonCache
-from mulaco.db.mapper import trans_bo_map_po
+from mulaco.core.app import App
 from mulaco.db.service import DbService as DbService
 from mulaco.excel.utils import excel_col_alpha2num
-from mulaco.models.business_model import ExcelSheetBO, TransInfoBO
-from mulaco.models.config_model import ExcelVO, LanguageVO
+from mulaco.models.bo_model import ExcelSheetBO, TransInfoBO
+from mulaco.models.dto_model import ExcelDTO, LanguageDTO
+from mulaco.models.mapper import trans_bo_map_po
 from mulaco.translate.cli import TranslateCli
 
-from ..models.config_model import LanguagesVO
+from ..models.dto_model import LanguagesConfigDTO
 
 log = getLogger(__name__)
 
@@ -18,42 +19,38 @@ log = getLogger(__name__)
 class TranslateService:
     CACHE_EXCEL_TBL = "excels"
 
-    def __init__(self, db: DbService, cache: JsonCache):
-        self.db = db
-        self.cache = cache
+    def __init__(self, app: App):
+        self.app = app
+        self.db = app.db
+        self.cache = app.cache
+        self.langs_mapper: dict[str, LanguageDTO] = app.langs_mapper
+        self.dst_langs: list[LanguageDTO] = app.dst_langs
         self.api_services: dict[str, TranslateCli] = {}
-        self.lang_mapper: dict[str, LanguageVO] = {}
-        self.dst_langs: list[LanguageVO] = []
 
     def register_service(self, api: TranslateCli):
         self.api_services[api.name] = api
 
-    def setup_lang_config(self, langs_config: LanguagesVO):
+    def map_lang_with_service(self):
         """配置待翻译语言"""
-        dst_langs: list[LanguageVO] = []
-        for lang in langs_config.langs:
-            # 默认加入
-            self.lang_mapper[lang.code] = lang
-            # 如果激活该语言，则寻找对应服务
-            if lang.active:
-                name = lang.service_name
-                lang.service = self.api_services[name]
-                dst_langs.append(lang)
-        self.dst_langs = sorted(dst_langs, key=lambda x: x.offset)
+        for k, v in self.app.langs_mapper.items():
+            if v.active:
+                name = v.service_name
+                v.service = self.api_services[name]
 
-    def translate_excel(self, excel: ExcelVO, src: str):
+    def translate_excel(self, excel: ExcelDTO, src: str):
         for dst_lang in self.dst_langs:
-            dst = dst_lang.code
             for sheet in excel.sheets:
                 exsh_bo = ExcelSheetBO(
-                    excel.excel_name, sheet.sheet_name, header=sheet.header_row
+                    excel=excel.excel_name,
+                    sheet=sheet.sheet_name,
+                    header=sheet.header_row,
                 )
                 cols = sheet.lang_cols[src]
                 for col_alpha in cols:
                     col = excel_col_alpha2num(col_alpha)
-                    self._translate_exsh_src(exsh_bo, src, dst, col)
+                    self._translate_exsh_src(exsh_bo, src, dst_lang, col)
                 log.debug(
-                    f"已经翻译 {excel.excel_name}.{sheet.sheet_name} 的 {col_alpha} 列 {src}-> {dst}"
+                    f"已经翻译 {excel.excel_name}.{sheet.sheet_name} 的 {col_alpha} 列 {src}-> {dst_lang}"
                 )
 
     def _translate_exsh_src(self, exsh_bo: ExcelSheetBO, src: str, dst: str, col: int):
@@ -73,6 +70,6 @@ class TranslateService:
             self.db.upsert_trans_info(trans_po)
 
     def _translate_core(self, src: str, dst: str, text: str):
-        dst_lang = self.lang_mapper[dst]
+        dst_lang = self.langs_mapper[dst]
         service: TranslateCli = dst_lang.service
         return service.api_translate_text(src, dst, text)

@@ -21,6 +21,7 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
 from tencentcloud.tmt.v20180321 import models, tmt_client
 
 from mulaco.base.db import JsonCache
+from mulaco.core.app import App
 from mulaco.db.service import DbService as DbService
 
 log = getLogger(__name__)
@@ -84,9 +85,10 @@ class LocalCli(TranslateCli, ServiceCache):
 
     CACHE_TBL = "local-trans-cache"
 
-    def __init__(self, cache: JsonCache):
-        self.cache = cache
-        ServiceCache.__init__(self, cache)
+    def __init__(self, app: App):
+        self.app = app
+        self.cache = app.cache
+        ServiceCache.__init__(self, app.cache)
 
     def api_translate_text(self, src: str, dst: str, text: str):
         self.cache_get_gid(src, dst)
@@ -246,8 +248,8 @@ class TencentCli(TranslateCli):
 
     CACHE_TBL = "tencent-cache"
 
-    def __init__(self, cache: JsonCache):
-        self.cache = cache
+    def __init__(self, app: App):
+        self.cache = app.cache
         id = os.getenv("TENCENTCLOUD_SECRET_ID")
         key = os.getenv("TENCENTCLOUD_SECRET_KEY")
         cred = credential.Credential(id, key)

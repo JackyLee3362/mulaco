@@ -2,18 +2,17 @@ import logging
 import os
 from pathlib import Path
 
+from mulaco.base.config import TomlConfig
 from mulaco.base.scaffold import Scaffold
-from mulaco.base.settings import TomlConfig
 from mulaco.db.service import DbService
 from mulaco.excel.exporter import ExcelExporter
 from mulaco.excel.loader import ExcelLoader
 from mulaco.fix.post_fix import ExcelPostFixer
 from mulaco.fix.pre_fix import ExcelPreFixer
-from mulaco.models.config_model import BatchExcelVO, LanguagesVO, LanguageVO
+from mulaco.models.dto_model import BatchExcelDTO, LanguageDTO, LanguagesConfigDTO
 from mulaco.translate.service import TranslateService
 
 log = logging.getLogger(__name__)
-import flask
 
 
 class ApiService:
@@ -24,27 +23,27 @@ class ApiService:
         self.cache = app.cache
         # 设置 batch excel 配置
 
-    def setup_lang_config(self, langs_config: LanguagesVO):
+    def setup_lang_config(self, langs_config: LanguagesConfigDTO):
         """配置待翻译语言
         TODO 感觉这里和 translate.service 中的代码重复，是否可以提取优化
         """
         self.langs_config = langs_config
         self.dst_langs: list[str] = None
-        self.lang_mapper: dict[str, LanguageVO] = {}
-        dst_langs: list[LanguageVO] = []
+        self.lang_mapper: dict[str, LanguageDTO] = {}
+        dst_langs: list[LanguageDTO] = []
         for lang in langs_config.langs:
             # 默认加入
             self.lang_mapper[lang.code] = lang
             # 如果激活该语言，则寻找对应服务
             if lang.active:
                 dst_langs.append(lang)
-        self.dst_langs = sorted(dst_langs, key=lambda x: x.offset)
+        self.dst_langs = sorted(dst_langs, key=lambda x: x.order)
 
     def setup_batch_excel(self, excel_config: str | Path):
         if not os.path.exists(excel_config):
             raise FileNotFoundError("batch 配置文件不存在")
         d = TomlConfig(excel_config)
-        self.batch_excel = BatchExcelVO.from_dict(d)
+        self.batch_excel = BatchExcelDTO.from_dict(d)
 
     # 第 1 步：加载数据
     def api_load_excels(self):

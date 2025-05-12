@@ -1,4 +1,7 @@
-import tomllib  # Python 3.11+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 __all__ = ("TomlConfig",)
 
