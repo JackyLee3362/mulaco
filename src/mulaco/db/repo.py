@@ -1,5 +1,5 @@
 import logging
-from typing import Generic, List, TypeVar
+from typing import Generic, List, Optional, TypeVar, Union
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -27,7 +27,7 @@ class BaseRepo(Generic[T]):
             stmt.limit(limit)
         return list(self.session.scalars(stmt).all())
 
-    def get_by_id(self, id: int) -> T | None:
+    def get_by_id(self, id: int) -> Optional[T]:
         return self.session.get(self.model, id)
 
     def get_one_by_condi(self, condi: tuple) -> T:

@@ -6,6 +6,7 @@ import time
 # 可以看作是配置服务向下传递的 DTO
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional, Union
 
 from dataclasses_json import dataclass_json
 
@@ -16,9 +17,9 @@ class LanguageDTO:
     name: str
     code: str
     active: bool = field(default=True)
-    order: int | None = field(default=None)
-    service_name: str | None = field(default=None)
-    service: object | None = field(repr=False, default=None)
+    order: Optional[int] = field(default=None)
+    service_name: Optional[str] = field(default=None)
+    service: Optional[object] = field(repr=False, default=None)
 
     def from_dict(self, *args, **kwargs) -> LanguageDTO: ...
 
@@ -48,8 +49,8 @@ class SheetDTO:
     lang_cols: dict[str, list[str]]
     header_row: int = field(repr=False)
     use_src_lang: str = field(repr=False)
-    max_row: int | None = field(repr=False, default=None)
-    max_col: int | None = field(repr=False, default=None)  # index 从 1 开始
+    max_row: Optional[int] = field(repr=False, default=None)
+    max_col: Optional[int] = field(repr=False, default=None)  # index 从 1 开始
     is_term: bool = field(default=False, repr=False)
 
     def from_dict(self, *args, **kwargs) -> SheetDTO: ...
@@ -68,9 +69,9 @@ class ExcelDTO:
     excel_name: str
     sheets: list[SheetDTO]
     skip: bool = field(default=False, repr=False)
-    src_path: str | None = field(default=None, repr=False)
-    dst_path: str | None = field(default=None, repr=False)
-    refs: list[str] = field(default=list, repr=False)
+    src_path: Optional[str] = field(default=None, repr=False)
+    dst_path: Optional[str] = field(default=None, repr=False)
+    refs: list[str] = field(default_factory=list, repr=False)
 
     def from_dict(self, *args, **kwargs) -> ExcelDTO: ...
 

@@ -1,4 +1,4 @@
-from sqlalchemy import String, UniqueConstraint
+from sqlalchemy import JSON, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -47,12 +47,12 @@ class CellInfoPO(Base):
         String(length=2048), comment="处理过的文本", nullable=True
     )
 
-    # 自定义类型，用于扩展，一般来说
-    # - 0x00 普通类型
-    # - 0x01 带标签的文本，需要使用 proc_text
-    # - 0x10 带引用的文本，需要使用 proc_text
-    # - 0x11 带标签和引用的文本，需要使用 proc_text
-    type: Mapped[int] = mapped_column(default=0)
+    # 存储元数据
+    # None 普通文本或者 {}
+    # 带引用的文本 {"refs":[...]}
+    # 带标签的文本 {"tags":[...]}
+    json: Mapped[dict] = mapped_column(JSON, nullable=True)
+
     is_delete: Mapped[bool] = mapped_column(comment="软删除", default=False)
 
     # 唯一索引约束

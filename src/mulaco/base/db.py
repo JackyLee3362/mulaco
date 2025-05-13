@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from tinydb import Query, TinyDB
 
@@ -16,7 +17,7 @@ class JsonCache:
         self.cache = TinyDB(cache_url)
         self.query = Query()
 
-    def set(self, key: str, value: str | dict, tbl: str = None):
+    def set(self, key: str, value: Union[str, dict], tbl: str = None):
         table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:
@@ -26,7 +27,7 @@ class JsonCache:
             log.debug("数据不存在，插入键")
             table.insert({"key": key, "val": value})
 
-    def get(self, key: str, tbl: str = None, default: str | dict | list = None):
+    def get(self, key: str, tbl: str = None, default: Union[str, dict, list] = None):
         table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:

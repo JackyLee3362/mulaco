@@ -6,6 +6,7 @@ from logging import getLogger
 
 # 腾讯服务需要
 from time import sleep
+from typing import Optional, Union
 
 # pip install deepl
 import deepl
@@ -64,7 +65,7 @@ class GidCache:
     def get_gid_key(self, src: str, dst: str):
         return f"{src}-{dst}"
 
-    def get_cached_gid(self, src: str, dst: str) -> str | None:
+    def get_cached_gid(self, src: str, dst: str) -> Optional[str]:
         """获取 gid，如果没有则为空"""
         gid_key = self.get_gid_key(src, dst)
         if not isinstance(gid_key, str):
@@ -109,6 +110,7 @@ class LocalCli(TranslateCli, GidCache):
     def api_translate_text(self, src: str, dst: str, text: str):
         d = self.api_get_glossary(src, dst)
         # 单词替换(从小词替换)
+        # 但是不替换标签内的内容
         sorted_key = sorted(d.keys(), key=len)
         translated_text = text
         for key in sorted_key:
@@ -284,16 +286,17 @@ class TencentCli(TranslateCli):
         self.local_cli = LocalCli(app)
 
     def api_translate_text(self, src, dst, text):
+        local_trans = self.local_cli.api_translate_text(src, dst, text)
         try:
             req = models.TextTranslateRequest()
             req.Source = src
-            req.SourceText = text
+            req.SourceText = local_trans
             req.Target = dst
             req.ProjectId = 0
             resp = self.client.TextTranslate(req)
+            return resp.TargetText
         except TencentCloudSDKException as e:
             log.error(e)
-        return resp.TargetText
 
     def api_create_glossary(self, src, dst, entries):
         return self.local_cli.api_create_glossary(src, dst, entries)
