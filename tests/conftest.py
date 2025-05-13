@@ -1,5 +1,3 @@
-import warnings
-
 import pytest
 import tomllib
 
@@ -12,9 +10,6 @@ from mulaco.excel.exporter import ExcelExporter
 from mulaco.models.bo_model import CellInfoBO, ExcelSheetBO, TransInfoBO
 from mulaco.models.dto_model import BatchExcelDTO, ExcelDTO
 from mulaco.models.mapper import cell_bo_map_po, exsh_bo_map_po, trans_bo_map_po
-
-# 忽略所有警告
-warnings.simplefilter("ignore")
 
 
 # @pytest.fixture(scope="session")
@@ -91,21 +86,3 @@ def app() -> App:
     app.init_base()
     app.init_app()
     return app
-
-
-# ------------------------------------------------------------
-# 一些工具类
-
-
-@pytest.fixture(scope="session")
-def exporter(app):
-    config_file = "config/batch1.toml"
-    d = tomllib.load(open(config_file, "rb"))
-
-    # 从 config 加载的数据
-    eb = BatchExcelDTO.from_dict(d)
-    excel = eb.excels[0]
-
-    # 从缓存中更新数据
-    excel_d = ExcelDTO.to_dict(excel)
-    return ExcelExporter(app)
