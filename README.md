@@ -21,14 +21,18 @@ pip install requirements.txt
 ```sh
 # 测试 CLI 是否正常
 python main.py --help
-python main.py 
-
+# 加载数据
+python main.py load
+# 修复数据
+python main.py pre
+# 翻译数据
+python main.py translate
+# 修复翻译
+python main.py post
+# 导出
+python main.py export
 ```
 
 ## 配置
 
-## start
-
-```sh
-export PYTHONPATH="./src"; python main.py --args
-```
+TODO
