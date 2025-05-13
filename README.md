@@ -35,4 +35,36 @@ python main.py export
 
 ## 配置
 
-TODO
+### 环境变量
+
+环境变量配置，在根目录创建 `.env` 文件
+
+```ini
+PYTHONPATH="src"
+TENCENTCLOUD_SECRET_ID="YOUR SECRET ID"
+TENCENTCLOUD_SECRET_KEY="YOUR SECRET KEY"
+DEEPL_AUTH_KEY="YOUR AUTH KEY"
+; 测试环境，定义该变量后
+; 会自动读取 config/{MULACO_ENV}/settings.toml 的配置文件
+MULACO_ENV="test"
+```
+
+### 配置文件
+
+```sh
+./config
+│  dict.toml     # 用户词典
+│  excels.toml   # excel 配置文件
+│  lang.toml     # 语言配置
+│  settings.toml # 默认配置文件，先读取，
+├─dev
+│  settings.toml # 如果设置了 MULACO_ENV 属性，则会读取该文件
+└─test
+   settings.toml
+```
+
+## 工作流
+
+1. 编辑配置文件
+2. 运行程序
+3. 使用 `excel` 打开有链接的文件，点击 数据 - 工作薄链接 - 更改有问题的源
