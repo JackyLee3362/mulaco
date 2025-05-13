@@ -7,4 +7,5 @@ excel_name = "ClothingConfig.xlsx"
 [[excels.sheets]]
 header_row = 3
 sheet_name = "Sheet1"
+use_src_lang = "en"
 lang_cols = { "en" = ["C", "G"], "zh" = ["B", "F"] }
