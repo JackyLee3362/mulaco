@@ -47,6 +47,7 @@ class SheetDTO:
     sheet_name: str
     lang_cols: dict[str, list[str]]
     header_row: int = field(repr=False)
+    use_src_lang: str = field(repr=False)
     max_row: int | None = field(repr=False, default=None)
     max_col: int | None = field(repr=False, default=None)  # index 从 1 开始
     is_term: bool = field(default=False, repr=False)

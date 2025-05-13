@@ -11,7 +11,6 @@ from mulaco.db.sql import (
     build_sql_get_not_proc_cells,
 )
 from mulaco.models.bo_model import ExcelSheetBO, TransInfoBO
-from mulaco.models.mapper import exsh_bo_map_po
 from mulaco.models.po_model import Base, CellInfoPO, ExcelSheetPO, TransInfoPO
 
 log = logging.getLogger(__name__)

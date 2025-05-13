@@ -2,16 +2,14 @@ from __future__ import annotations
 
 from logging import getLogger
 
-from mulaco.base.db import JsonCache
 from mulaco.core.app import App
 from mulaco.db.service import DbService as DbService
 from mulaco.excel.utils import excel_col_alpha2num
 from mulaco.models.bo_model import ExcelSheetBO, TransInfoBO
 from mulaco.models.dto_model import ExcelDTO, LanguageDTO
 from mulaco.models.mapper import trans_bo_map_po
-from mulaco.translate.cli import TranslateCli
+from mulaco.translate.cli import DeepLCli, MockCli, TencentCli, TranslateCli
 
-from ..models.dto_model import LanguagesConfigDTO
 
 log = getLogger(__name__)
 
@@ -26,6 +24,16 @@ class TranslateService:
         self.langs_mapper: dict[str, LanguageDTO] = app.langs_mapper
         self.dst_langs: list[LanguageDTO] = app.dst_langs
         self.api_services: dict[str, TranslateCli] = {}
+        self.init_service()
+
+    def init_service(self):
+        deepl = DeepLCli(self.app)
+        tencent = TencentCli(self.app)
+        mockcli = MockCli(self.app)
+        self.register_service(deepl)
+        self.register_service(tencent)
+        self.register_service(mockcli)
+        self.map_lang_with_service()
 
     def register_service(self, api: TranslateCli):
         self.api_services[api.name] = api
@@ -37,7 +45,7 @@ class TranslateService:
                 name = v.service_name
                 v.service = self.api_services[name]
 
-    def translate_excel(self, excel: ExcelDTO, src: str):
+    def translate_excel(self, excel: ExcelDTO):
         for dst_lang in self.dst_langs:
             for sheet in excel.sheets:
                 exsh_bo = ExcelSheetBO(
@@ -45,6 +53,7 @@ class TranslateService:
                     sheet=sheet.sheet_name,
                     header=sheet.header_row,
                 )
+                src = sheet.use_src_lang
                 cols = sheet.lang_cols[src]
                 for col_alpha in cols:
                     col = excel_col_alpha2num(col_alpha)

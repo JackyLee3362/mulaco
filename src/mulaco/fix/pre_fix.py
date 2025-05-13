@@ -20,7 +20,9 @@ class ExcelPreFixer:
         for sheet in excel.sheets:
             sh_name = sheet.sheet_name
             bo = ExcelSheetBO(
-                excel.excel_name, sheet=sheet.sheet_name, header=sheet.header_row
+                excel=excel.excel_name,
+                sheet=sheet.sheet_name,
+                header=sheet.header_row,
             )
             # 获取所有没有处理过的 cell (sheet 层面)
             res = self.db.get_all_not_processed_cells(bo, "en", None)
