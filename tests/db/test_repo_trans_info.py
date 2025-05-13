@@ -1,7 +1,6 @@
 from pprint import pprint
 
 import pytest
-import sqlalchemy
 
 from mulaco.db.repo import TransInfoRepo
 from mulaco.db.service import DbService
