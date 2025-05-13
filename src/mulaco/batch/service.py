@@ -48,7 +48,6 @@ class BatchService:
         log.info("开始批量翻译 excel  ...")
         trans_service = TranslateService(self.app)
         for excel in self.batch_excels.excels:
-            # TODO 写死
             try:
                 trans_service.translate_excel(excel)
             except Exception:

@@ -6,7 +6,7 @@ from logging import getLogger
 
 # 腾讯服务需要
 from time import sleep
-from typing import Optional, Union
+from typing import Optional
 
 # pip install deepl
 import deepl
@@ -98,6 +98,8 @@ class GidCache:
 class LocalCli(TranslateCli, GidCache):
     """本地缓存翻译，主要加载本地的术语字典"""
 
+    name = "local-cli"
+
     CACHE_TBL = "local-cli-cache"
 
     def __init__(self, app: App):
@@ -109,12 +111,15 @@ class LocalCli(TranslateCli, GidCache):
 
     def api_translate_text(self, src: str, dst: str, text: str):
         d = self.api_get_glossary(src, dst)
-        # 单词替换(从小词替换)
+        # 单词替换(从大词替换)
         # 但是不替换标签内的内容
-        sorted_key = sorted(d.keys(), key=len)
+        # TODO 每次都排序很费时
+        sorted_key = sorted(d.keys(), key=lambda x: -len(x))
         translated_text = text
         for key in sorted_key:
-            translated_text = translated_text.replace(key, d[key])
+            if key in translated_text:
+                # TODO 单词的复数形式，小写形式等
+                translated_text = translated_text.replace(key, d[key])
         return translated_text
 
     def load_dict_glossary(self, d: dict[str, dict[str, dict[str, str]]]):
@@ -193,16 +198,16 @@ class DeepLCli(TranslateCli, GidCache):
     DEEPL_AUTH_KEY = os.getenv("DEEPL_AUTH_KEY")
     CACHE_TBL = "deepl-cache"
 
-    def __init__(self, cache: JsonCache):
+    def __init__(self, app: App):
         """初始化
 
         Args:
             db (DbService): 存翻译结果的
             cache (KVCache): 存 glossary id 的
         """
-        self.cache = cache
+        self.cache = app.cache
         self.cli = deepl.Translator(self.DEEPL_AUTH_KEY)
-        GidCache.__init__(self, cache)
+        GidCache.__init__(self, app.cache)
 
     def api_translate_text(self, src: str, dst: str, text: str):
         """翻译文字"""
@@ -294,6 +299,7 @@ class TencentCli(TranslateCli):
             req.Target = dst
             req.ProjectId = 0
             resp = self.client.TextTranslate(req)
+            sleep(0.2)
             return resp.TargetText
         except TencentCloudSDKException as e:
             log.error(e)

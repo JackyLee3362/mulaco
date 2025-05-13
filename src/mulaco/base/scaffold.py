@@ -1,5 +1,5 @@
 from mulaco.base.config import TomlConfig
-from mulaco.base.constant import SETTING_FILE_PATH
+from mulaco.base.constant import ENV, SETTING_ENV_FILE_PATH, SETTINGS_DEFAULT_PATH
 from mulaco.base.db import JsonCache
 from mulaco.base.logger import set_logger
 
@@ -21,7 +21,9 @@ class Scaffold:
     def init_config(self):
         # 初始配置
         self.config = TomlConfig()
-        self.config.load_file(SETTING_FILE_PATH)
+        self.config.load_file(SETTINGS_DEFAULT_PATH)
+        if ENV:
+            self.config.load_file(SETTING_ENV_FILE_PATH)
 
     def init_logging(self):
         # 日志配置

@@ -50,6 +50,7 @@ class ExcelPostFixer:
                     info = cell_po.json
                     order = self.langs_mapper[dst].order
                     total = len(self.dst_langs)
+                    # 除了对单元格解析，还需要对翻译质量把关
                     proc_text = self.parser.post_parser(
                         text, info, ref_dtos, order, total
                     )

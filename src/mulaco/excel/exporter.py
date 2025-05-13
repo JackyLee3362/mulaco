@@ -70,7 +70,7 @@ class ExcelExporter:
                 res = self.db.get_all_write_trans(exsh_bo, src, dst, col_num)
                 # 计算列
                 d_col = max_col + offset + total_dst_lang * idx
-                # TODO 写入表头
+                # 写入表头
                 header_text = src_col + "列" + self.langs_mapper[dst].name
                 sheet.cell(header_row, d_col).value = header_text
 

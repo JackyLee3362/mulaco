@@ -31,19 +31,18 @@ class App(Scaffold):
         if not os.path.exists(config_path):
             raise FileNotFoundError("语言配置文件不存在，请检查")
         d = TomlConfig(config_path)
-        lang_conifg = LanguagesConfigDTO.from_dict(d.translate.model)
-        self.langs_mapper = lang_conifg.langs
+        lang_config = LanguagesConfigDTO.from_dict(d.translate.model)
+        self.langs_mapper = lang_config.langs
         self.dst_langs = sorted(
-            lang_conifg.dst_langs, key=lambda x: self.langs_mapper[x].order
+            lang_config.dst_langs, key=lambda x: self.langs_mapper[x].order
         )
 
-    # TODO 现在就是必须要有这个配置，应该将其设置为可选项
-    # 即没有这个文件也可以正常运行
     def import_dict(self):
-        """导入用户自定义字典"""
+        """导入用户自定义字典，可选项"""
         config_path = self.config.app.translate.dict_url
         if not os.path.exists(config_path):
-            raise FileNotFoundError("语言配置文件不存在，请检查")
+            self.user_dict = {}
+            return
         user_dict = TomlConfig(config_path)
         self.user_dict = user_dict.dict
 

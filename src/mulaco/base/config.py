@@ -1,7 +1,7 @@
-# try:
-#     import tomllib  # Python 3.11+
-# except ModuleNotFoundError:
-import tomli as tomllib
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 __all__ = ("TomlConfig",)
 
@@ -45,7 +45,17 @@ class TomlConfig(_AttrDict):
         if params:
             self.setdefault(params).update(data)
         else:
-            self.update(data)
+            self = recursive_update(self, data)
+
+
+def recursive_update(src: dict, data: dict):
+    for key, val in data.items():
+        _v = src.get(key)
+        if isinstance(val, dict) and isinstance(_v, dict):
+            src[key] = recursive_update(_v, val)
+        else:
+            src[key] = val
+    return src
 
 
 if __name__ == "__main__":

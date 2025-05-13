@@ -31,9 +31,9 @@ class JsonCache:
         table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:
-            log.debug("数据存在，直接返回")
+            # log.debug("数据存在，直接返回")
             return res[0]["val"]
-        log.warning("数据不存在，返回默认值")
+        # log.warning("数据不存在，返回默认值")
         return default
 
     def get_all(self, tbl: str = None):

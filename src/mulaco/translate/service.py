@@ -10,7 +10,6 @@ from mulaco.models.dto_model import ExcelDTO, LanguageDTO
 from mulaco.models.mapper import trans_bo_map_po
 from mulaco.translate.cli import DeepLCli, MockCli, TencentCli, TranslateCli
 
-
 log = getLogger(__name__)
 
 
@@ -46,21 +45,23 @@ class TranslateService:
                 v.service = self.api_services[name]
 
     def translate_excel(self, excel: ExcelDTO):
-        for dst_lang in self.dst_langs:
-            for sheet in excel.sheets:
-                exsh_bo = ExcelSheetBO(
-                    excel=excel.excel_name,
-                    sheet=sheet.sheet_name,
-                    header=sheet.header_row,
-                )
+        ex = excel.excel_name
+        for sheet in excel.sheets:
+            sh = sheet.sheet_name
+            exsh_bo = ExcelSheetBO(
+                excel=excel.excel_name,
+                sheet=sheet.sheet_name,
+                header=sheet.header_row,
+            )
+            for dst_lang in self.dst_langs:
                 src = sheet.use_src_lang
                 cols = sheet.lang_cols[src]
                 for col_alpha in cols:
                     col = excel_col_alpha2num(col_alpha)
                     self._translate_exsh_src(exsh_bo, src, dst_lang, col)
-                log.debug(
-                    f"已经翻译 {excel.excel_name}.{sheet.sheet_name} 的 {col_alpha} 列 {src}-> {dst_lang}"
-                )
+
+            log.debug(f"已经翻译 {ex}.{sh} 的 {col_alpha} 列 {src}-> {dst_lang}")
+        log.info(f"{ex} 翻译完成")
 
     def _translate_exsh_src(self, exsh_bo: ExcelSheetBO, src: str, dst: str, col: int):
         """翻译 exsh"""
@@ -77,6 +78,7 @@ class TranslateService:
             trans_po.cell_id = cell_po.id
 
             self.db.upsert_trans_info(trans_po)
+            log.debug(f"翻译: {text} -> {translated_text}")
 
     def _translate_core(self, src: str, dst: str, text: str):
         dst_lang = self.langs_mapper[dst]
