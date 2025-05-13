@@ -39,3 +39,11 @@ class ExcelPreFixer:
     # TODO 转换为 raw_text
     def _process_raw_text(self, text: str):
         return f"pre({text})"
+
+    def handle_tag(self):
+        """处理 <tag> 标签的翻译"""
+        pass
+
+    def handle_ref(self):
+        """处理带有引用的 excel"""
+        pass

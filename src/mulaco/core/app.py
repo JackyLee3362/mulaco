@@ -45,7 +45,7 @@ class App(Scaffold):
         if not os.path.exists(config_path):
             raise FileNotFoundError("语言配置文件不存在，请检查")
         user_dict = TomlConfig(config_path)
-        self.user_dict = user_dict
+        self.user_dict = user_dict.dict
 
     def init_db(self):
         """初识化数据库"""

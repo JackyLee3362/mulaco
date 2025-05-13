@@ -25,8 +25,6 @@ class ExcelExporter:
 
     # -------------------- export --------------------
     def export_excel(self, excel: ExcelDTO):
-        if excel.skip:
-            log.debug(f"{excel.excel_name} 跳过")
         excel = self.flush_excel(excel)
         try:
             # 第一步，复制数据

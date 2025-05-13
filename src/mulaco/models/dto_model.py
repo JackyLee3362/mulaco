@@ -70,6 +70,7 @@ class ExcelDTO:
     skip: bool = field(default=False, repr=False)
     src_path: str | None = field(default=None, repr=False)
     dst_path: str | None = field(default=None, repr=False)
+    refs: list[str] = field(default=list, repr=False)
 
     def from_dict(self, *args, **kwargs) -> ExcelDTO: ...
 
@@ -92,6 +93,12 @@ class BatchExcelDTO:
         for excel in self.excels:
             excel.src_path = str(src.joinpath(excel.excel_name))
             excel.dst_path = str(dst.joinpath(excel.excel_name))
+        # 删除 skip 文件
+        excels = []
+        for excel in self.excels:
+            if not excel.skip:
+                excels.append(excel)
+        self.excels = excels
 
     def from_dict(self, *args, **kwargs) -> BatchExcelDTO: ...
 

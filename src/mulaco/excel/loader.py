@@ -28,9 +28,6 @@ class ExcelLoader:
         把要的行和列读到缓存，再进行持久化操作，
         否则一张表就要 1-2 分钟，很费时。
         """
-        if excel.skip:
-            log.debug(f"{excel} 跳过")
-            return
         try:
             wb = load_workbook(excel.src_path)
             ex_name = excel.excel_name
