@@ -1,3 +1,4 @@
+# 默认配置
 [app]
 name = "mulaco"
 version = "0.0.1"
@@ -18,9 +19,9 @@ url = "sqlite://db/app.db"
 url = "db/cache.json"
 
 [app.excel]
-excel_conf_url = "config/batch1.toml"
+excel_conf_url = "config/excels.toml"
 
 [app.translate]
 # 相对路径
 lang_conf_url = "config/lang.toml"
-dict_url = "config/user_dict.toml"
+dict_url = "config/dict.toml"

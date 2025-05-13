@@ -6,9 +6,9 @@ echo = false
 url = "db/cache.test.json"
 
 [app.excel]
-excel_conf_url = "config/batch-1.test.toml"
+excel_conf_url = "config/test/excels.toml"
 
 [app.translate]
 # 相对路径
-lang_conf_url = "config/lang.test.toml"
-dict_url = "config/user_dict.test.toml"
+lang_conf_url = "config/test/lang.toml"
+dict_url = "config/test/dict.toml"

@@ -1,4 +1,4 @@
-# 语言配置
+# 语言配置 使用 mock-cli 不使用真实的 dev
 [translate.model.langs.zh]
 name = '简中'
 code = 'zh'

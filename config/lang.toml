@@ -17,47 +17,47 @@ active = false
 [translate.model.langs.de]
 name = '德语'
 code = 'de'
-offset = 1
+order = 1
 service_name = "deepl-pro"
 
 [translate.model.langs.ko]
 name = '韩语'
 code = 'ko'
-offset = 2
+order = 2
 service_name = "deepl-pro"
 
 [translate.model.langs.th]
 name = '泰语'
 code = 'th'
-offset = 3
+order = 3
 service_name = "tencent-cloud"
 
 [translate.model.langs.ru]
 name = '俄语'
 code = 'ru'
-offset = 4
+order = 4
 service_name = "deepl-pro"
 
 [translate.model.langs.es]
 name = '西班牙语'
 code = 'es'
-offset = 5
+order = 5
 service_name = "deepl-pro"
 
 [translate.model.langs.fr]
 name = '法语'
 code = 'fr'
-offset = 6
+order = 6
 service_name = "deepl-pro"
 
 [translate.model.langs.pt]
 name = '葡萄牙语'
 code = 'pt'
-offset = 7
+order = 7
 service_name = "deepl-pro"
 
 [translate.model.langs.it]
 name = '意大利语'
 code = 'it'
-offset = 8
+order = 8
 service_name = "deepl-pro"

@@ -1,0 +1,32 @@
+src_dir = "data/src"
+dst_dir = "data/target"
+
+[[excels]]
+excel_name = "ClothingConfig.xlsx"
+skip = true
+
+[[excels.sheets]]
+header_row = 3
+sheet_name = "Sheet1"
+use_src_lang = "en"
+lang_cols = { en = ["C", "G"], zh = ["B", "F"] }
+
+[[excels]]
+excel_name = "BuffConfig.xlsx"
+skip = true
+
+[[excels.sheets]]
+header_row = 3
+sheet_name = "Main"
+use_src_lang = "en"
+lang_cols = { en = ["D", "N"], zh = ["B", "L"] }
+
+[[excels]]
+excel_name = "CuisineConfig.xlsx"
+refs = ["BuffConfig.xlsx"]
+
+[[excels.sheets]]
+header_row = 3
+sheet_name = "Sheet1"
+use_src_lang = "en"
+lang_cols = { en = ["C", "K"], zh = ["B", "J"], jp = ["D", "L"] }

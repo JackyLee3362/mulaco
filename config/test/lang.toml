@@ -1,0 +1,63 @@
+# 语言配置（ 2 门语言）
+[translate.model.langs.zh]
+name = '简中'
+code = 'zh'
+active = false
+
+[translate.model.langs.en]
+name = '英语'
+code = 'en'
+active = false
+
+[translate.model.langs.jp]
+name = '日语'
+code = 'jp'
+active = false
+
+[translate.model.langs.de]
+name = '德语'
+code = 'de'
+order = 1
+service_name = "deepl-pro"
+
+# [translate.model.langs.ko]
+# name = '韩语'
+# code = 'ko'
+# order = 2
+# service_name = "deepl-pro"
+
+[translate.model.langs.th]
+name = '泰语'
+code = 'th'
+order = 3
+service_name = "tencent-cloud"
+
+# [translate.model.langs.ru]
+# name = '俄语'
+# code = 'ru'
+# order = 4
+# service_name = "deepl-pro"
+
+# [translate.model.langs.es]
+# name = '西班牙语'
+# code = 'es'
+# order = 5
+# service_name = "deepl-pro"
+
+# [translate.model.langs.fr]
+# name = '法语'
+# code = 'fr'
+# order = 6
+# service_name = "deepl-pro"
+
+# [translate.model.langs.pt]
+# name = '葡萄牙语'
+# code = 'pt'
+# order = 7
+# service_name = "deepl-pro"
+
+# [translate.model.langs.it]
+# name = '意大利语'
+# code = 'it'
+# order = 8
+# service_name = "deepl-pro"
