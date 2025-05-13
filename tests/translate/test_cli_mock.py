@@ -1,7 +1,6 @@
 from pprint import pprint
 
 import pytest
-import tomllib
 
 from mulaco.base.config import TomlConfig
 from mulaco.base.scaffold import Scaffold

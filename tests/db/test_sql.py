@@ -1,8 +1,8 @@
 from pprint import pprint
 
 import pytest
-import tomllib
 
+from mulaco.base.config import TomlConfig
 from mulaco.db.service import DbService
 from mulaco.db.sql import (
     build_sql_get_all_not_proc_trans,
@@ -24,7 +24,7 @@ def db() -> DbService:
 def excel() -> ExcelSheetBO:
 
     config_file = "config/batch1.toml"
-    d = tomllib.load(open(config_file, "rb"))
+    d = TomlConfig(config_file)
     eb = BatchExcelDTO.from_dict(d)
     excel = eb.excels[0]
     sheet = excel.sheets[0]
