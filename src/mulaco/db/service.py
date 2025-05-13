@@ -144,7 +144,7 @@ class DbService:
 
     def get_all_not_processed_trans(
         self, bo: ExcelSheetBO, src: str, dst: str, col: str
-    ) -> list[ExcelSheetPO, CellInfoPO, TransInfoPO]:
+    ) -> list[tuple[ExcelSheetPO, CellInfoPO, TransInfoPO]]:
         """获得【所有】【没有处理过】的【翻译】(ExcelSheetPO, CellInfoPO, TransInfoPO)
         为什么要返回三个对象：处理引用需要 excel 和 sheet 的信息
         """

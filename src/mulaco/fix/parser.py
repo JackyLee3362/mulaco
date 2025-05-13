@@ -1,11 +1,21 @@
+from __future__ import annotations
+
+import logging
 import re
+from collections import namedtuple
 from dataclasses import dataclass
+from pathlib import Path
 
 from bs4 import BeautifulSoup
+from dataclasses_json import dataclass_json
 
-from mulaco.excel.utils import excel_col_alpha_increment
+from mulaco.excel.utils import excel_col_num2alpha
+from mulaco.models.dto_model import ExcelDTO
+
+log = logging.getLogger(__name__)
 
 
+@dataclass_json
 @dataclass
 class RefMeta:
     excel: int
@@ -19,10 +29,15 @@ class RefMeta:
     def to_tag(self, idx: int):
         return f'<ref id="{idx}" />'
 
-    def to_ref(self, offset: int = 0):
-        col = excel_col_alpha_increment(self.col, offset)
-        res = f'"&[{self.excel}]{self.sheet}!${col}${self.row}&"'
+    def to_ref(self, dir: str, ex_name: str, ref_col: int = 0):
+        col = excel_col_num2alpha(ref_col)
+        res = rf'''"&'{dir}/[{ex_name}]{self.sheet}'!${col}${self.row}&"'''
+        res = rf'''"&'[{self.excel}]{self.sheet}'!${col}${self.row}&"'''
         return res
+
+    def from_dict(self, d: dict) -> RefMeta: ...
+
+    def to_dict(self) -> dict: ...
 
 
 class FixRePattern:
@@ -44,43 +59,133 @@ class FixRePattern:
     RE_TAG_COLOR = re.compile(r"<color=#[a-zA-Z0-9]{6}>|<\/color>|<sprite=\d+>|\{0\}")
     # ROOT tag
     RE_ROOT_TAG = re.compile(r"^<root>(.*)<\/root>$")
+    # 自替换 REF
+    SELF_REF_PATTERN = re.compile(r'(?<="&)(\[\d+\])(?=.+?\!\$[A-Z]+\$\d+&")')
+    # "&\[(\d+)\](?=.+?\!\$[A-Z]+?\$\d+?)&"
+
+
+parser_res = namedtuple("ParserResult", ["res", "msg"])
 
 
 class CellParser:
     TAG_ROOT = "root"
     TAG_REF = "ref"
     parser = "html.parser"
+    has_cal_key = "has_cal"
+    refs_key = "refs"
 
-    def text_add_root_tag(self, text: str):
+    def self_fix_ref(self, path: str, ex_name, text: str) -> bool:
+        _, msg = self.text_ref_to_tag(text)
+        if msg:
+            # 说明有 ref
+            txt = FixRePattern.SELF_REF_PATTERN.sub(f"{path}/[{ex_name}]", text)
+            log.debug(f"修复: {text} -> {txt}")
+            return txt
+        return text
+
+    def pre_parser(self, text: str) -> tuple[str, dict]:
+        info = {}
+        text, msg = self.text_del_cal(text)
+        if msg:
+            info[self.has_cal_key] = True
+        text, msg = self.text_ref_to_tag(text)
+        if msg:
+            # 如果有肯定是 dict
+            info[self.refs_key] = [m.to_dict() for m in msg]
+        if len(info):
+            return text, info
+        else:
+            return text, None
+
+    def post_parser(
+        self,
+        text: str,
+        info: dict,
+        ref_dtos: list[ExcelDTO] = [],
+        order: int = None,
+        total: int = None,
+    ) -> str:
+        if info is None:
+            return text
+        if info.get(self.refs_key):
+            text = self.text_add_root_tag(text)
+            refs = [RefMeta.from_dict(d) for d in info.get(self.refs_key)]
+            # 计算 ref_abs_cols 类似 [14, 18] 这样的绝对值
+            ref_info = self.calculate_ref_abs_cols(refs, ref_dtos, order, total)
+
+            text = self.text_tag_to_ref(text, refs, ref_info)
+            text = self.text_del_root_tag(text)
+        if info.get(self.has_cal_key):
+            text = self.text_add_cal(text)
+        return text
+
+    def text_add_root_tag(self, text: str) -> str:
         return f"<{self.TAG_ROOT}>{text}</{self.TAG_ROOT}>"
 
     def text_del_root_tag(self, text: str):
         return FixRePattern.RE_ROOT_TAG.sub(r"\1", text)
 
-    def excel_add_cal(self, text: str):
+    def text_add_cal(self, text: str) -> str:
         return f'="{text}"'
 
-    def excel_del_cal(self, text: str):
-        return FixRePattern.RE_CALCULATE.sub(r"\1", text)
+    def text_del_cal(self, text: str) -> parser_res:
+        if FixRePattern.RE_CALCULATE.match(text):
+            new_text = FixRePattern.RE_CALCULATE.sub(r"\1", text)
+            return parser_res(new_text, True)
+        return parser_res(text, False)
 
-    def excel_ref_to_tag(self, text: str) -> tuple[str, list[RefMeta]]:
+    def text_ref_to_tag(self, text: str) -> parser_res:
         refs = []
         idx = 0
 
         def ref_substr(match: re.Match):
+            nonlocal idx
             ref_info = RefMeta(*[g for g in match.groups()])
             refs.append(ref_info)
-            return ref_info.to_tag(idx)
+            r = ref_info.to_tag(idx)
+            idx += 1
+            return r
 
         new_text = FixRePattern.REF_PATTERN.sub(ref_substr, text)
-        return new_text, refs
+        if len(refs):
+            return parser_res(new_text, refs)
+        return parser_res(new_text, None)
 
-    def excel_tag_2_ref(self, text: str, offset: int, refs: list[RefMeta]) -> str:
+    # 该函数逻辑较为复杂
+    def calculate_ref_abs_cols(
+        self, refs: list[RefMeta], ref_dtos: list[ExcelDTO], order: int, total: int
+    ) -> list[int]:
+        res = []
+        # 遍历 ref_meta
+        for ref_meta in refs:
+            idx = ref_meta.excel
+            # 找到对应的 dto
+            dto = ref_dtos[idx - 1]
+            # 找到对应的 sheet
+            for sheet in dto.sheets:
+                if sheet.sheet_name == ref_meta.sheet:
+                    # 找到对应的 cols
+                    cols = sheet.lang_cols[sheet.use_src_lang]
+                    # 计算 col 在其中的位置
+                    factor = cols.index(ref_meta.col)
+                    # 取出 max_col
+                    max_col = sheet.max_col
+                    ref_col = max_col + factor * total + order
+                    ref_dir = str(Path(dto.dst_path).parent.absolute())
+                    # 将反斜杠替换为正斜杠
+                    ref_dir = ref_dir.replace("\\", "/")
+                    res.append((ref_dir, dto.excel_name, ref_col))
+        return res
+
+    def text_tag_to_ref(
+        self, text: str, refs: list[RefMeta], ref_info: list[tuple[str, str, int]]
+    ) -> str:
         soup = BeautifulSoup(text, self.parser)
         for ele in soup.find_all(self.TAG_REF):
             id = int(ele.get("id"))
             ref = refs[id]
-            s = ref.to_ref(offset)
+            ref_dir, ref_excel, ref_col = ref_info[id]
+            s = ref.to_ref(ref_dir, ref_excel, ref_col)
             ele.replace_with(s)
         new_text = str(soup)
         # & 符号会被转义，所以要手动替换

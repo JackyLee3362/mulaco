@@ -2,6 +2,7 @@
 import logging
 
 from mulaco.core.app import App
+from mulaco.fix.parser import CellParser
 from mulaco.models.bo_model import ExcelSheetBO
 from mulaco.models.dto_model import ExcelDTO
 from mulaco.models.po_model import CellInfoPO
@@ -14,6 +15,7 @@ class ExcelPreFixer:
     def __init__(self, app: App):
         self.db = app.db
         self.cache = app.cache
+        self.parser = CellParser()
 
     def pre_fix_excel(self, excel: ExcelDTO):
         ex_name = excel.excel_name
@@ -30,20 +32,10 @@ class ExcelPreFixer:
                 # 提前存储数据
                 cell_po: CellInfoPO
                 text = cell_po.raw_text
-                proc_text = self._process_raw_text(text)
+                proc_text, info = self.parser.pre_parser(text)
                 # 设置 cell
                 cell_po.proc_text = proc_text
+                if info:
+                    cell_po.json = info
                 self.db.upsert_cell(cell_po)
             log.debug(f"{ex_name}.{sh_name} 已经做好文本预处理")
-
-    # TODO 转换为 raw_text
-    def _process_raw_text(self, text: str):
-        return f"pre({text})"
-
-    def handle_tag(self):
-        """处理 <tag> 标签的翻译"""
-        pass
-
-    def handle_ref(self):
-        """处理带有引用的 excel"""
-        pass
