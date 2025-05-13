@@ -11,8 +11,10 @@ def local_cli(app: App):
     return LocalCli(app)
 
 
-def test_my_dict(app, local_cli: LocalCli):
-    d = app.user_dict
-    local_cli.load_dict_glossary(d)
-    ds = local_cli.api_list_glossaries()
-    pprint(ds)
+def test_my_dict(local_cli: LocalCli):
+    pprint(local_cli.api_get_glossary("en", "zh"))
+
+
+def test_translate(local_cli: LocalCli):
+    res = local_cli.api_translate_text("en", "zh", "hello, python")
+    print(res)

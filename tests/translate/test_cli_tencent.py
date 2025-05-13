@@ -11,3 +11,10 @@ def tencent_api(app):
 def test_1(tencent_api: TencentCli):
     res = tencent_api.api_translate_text("en", "zh", "hello, world")
     pprint(res)
+
+
+def test_2():
+    pass
+    import datetime
+
+    datetime.datetime.utcfromtimestamp()
