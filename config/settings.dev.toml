@@ -1,0 +1,14 @@
+[app.db]
+url = "sqlite:///db/app.dev.db"
+echo = false
+
+[app.cache]
+url = "db/cache.dev.json"
+
+[app.excel]
+excel_conf_url = "config/batch1.dev.toml"
+
+[app.translate]
+# 相对路径
+lang_conf_url = "config/lang.dev.toml"
+dict_url = "config/user_dict.dev.toml"

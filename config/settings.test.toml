@@ -1,25 +1,12 @@
-[app]
-name = "mulaco"
-version = "0.0.1"
-
-[app.logging]
-# debug = 10 , info = 20
-console_level = 10
-file_level = 20
-log_dir = ""
-log_filename_fmt = "%Y-%m-%d %H-%M-%S.log"
-date_fmt = "%Y-%m-%d %H:%M:%S"
-fmt = "[%(asctime)s] %(name)s - %(levelname)-8s %(funcName)s  : %(message)s"
-
 [app.db]
 url = "sqlite:///db/app.test.db"
 echo = false
 
 [app.cache]
-url = "db/cache.json"
+url = "db/cache.test.json"
 
 [app.excel]
-excel_conf_url = "config/batch1.toml"
+excel_conf_url = "config/batch-1.test.toml"
 
 [app.translate]
 # 相对路径

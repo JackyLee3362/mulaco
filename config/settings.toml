@@ -23,4 +23,4 @@ excel_conf_url = "config/batch1.toml"
 [app.translate]
 # 相对路径
 lang_conf_url = "config/lang.toml"
-dict_url = "config/dict.toml"
+dict_url = "config/user_dict.toml"
