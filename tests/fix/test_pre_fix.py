@@ -10,4 +10,4 @@ def pre_fixer(app):
 
 
 def test_pre_fix(app: App, pre_fixer: ExcelPreFixer):
-    pre_fixer.pre_fix_excel(app.batch_excels.excels[0])
+    pre_fixer.pre_process_excel(app.batch_excels.excels[0])

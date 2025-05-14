@@ -13,7 +13,7 @@ def test_1_batch_service(service: BatchService):
 
 
 def test_2_batch_service(service: BatchService):
-    service.batch_pre_fix_excels()
+    service.batch_pre_process_excels()
 
 
 def test_3_batch_service(service: BatchService):
