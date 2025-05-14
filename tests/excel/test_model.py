@@ -11,14 +11,11 @@ from mulaco.models.dto_model import (
 
 def test_load_config():
     d = TomlConfig("config/mock/excels.toml")
-    pprint(d)
 
 
 def test_map_dict():
     d = TomlConfig("config/mock/excels.toml")
     dto = BatchExcelDTO.from_dict(d)
-    pprint(d)
-    pprint(dto)
 
 
 def test_map_dict_2():
@@ -36,4 +33,3 @@ def test_map_lang():
 
     d = TomlConfig("config/mock/lang.toml")
     res = LanguagesConfigDTO.from_dict(d.translate.model)
-    print(res)

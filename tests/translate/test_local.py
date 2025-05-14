@@ -11,10 +11,6 @@ def local_cli(app: App):
     return LocalDictCache(app)
 
 
-def test_my_dict(local_cli: LocalDictCache):
-    pprint(local_cli._get_glossary("en", "zh"))
-
-
 def test_translate(local_cli: LocalDictCache):
     res = local_cli.api_translate_text("en", "zh", "hello, python")
     print(res)
