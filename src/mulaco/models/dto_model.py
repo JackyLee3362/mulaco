@@ -33,9 +33,11 @@ class LanguagesConfigDTO:
     dst_langs: list[str] = field(init=None, default_factory=list)
 
     def __post_init__(self):
+        dst_langs = []
         for lang_str, lang_obj in self.langs.items():
             if lang_obj.active:
-                self.dst_langs.append(lang_str)
+                dst_langs.append(lang_str)
+        self.dst_langs = sorted(dst_langs, key=lambda x: self.langs[x].order)
 
     def from_dict(self, *args, **kwargs) -> LanguagesConfigDTO: ...
 

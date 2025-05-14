@@ -7,7 +7,6 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from mulaco.core.app import App
 from mulaco.excel.utils import excel_col_alpha2num
-from mulaco.fix.parser import CellParser
 from mulaco.models.bo_model import ExcelSheetBO
 from mulaco.models.dto_model import ExcelDTO, SheetDTO
 
@@ -35,8 +34,7 @@ class ExcelExporter:
             wb = load_workbook(excel.dst_path)
             for sheet_dto in excel.sheets:
                 sheet = wb[sheet_dto.sheet_name]
-                # 该参数写死，但是之后是可以配置的
-                self.write_sheet(excel, sheet, sheet_dto, "en")
+                self.export_sheet(excel, sheet, sheet_dto)
 
             # 保存
             wb.save(excel.dst_path)
@@ -50,11 +48,10 @@ class ExcelExporter:
         d = self.cache.get(excel_dto.excel_name, self.CACHE_EXCEL_TBL)
         return ExcelDTO.from_dict(d)
 
-    def write_sheet(
-        self, ex_dto: ExcelDTO, sheet: Worksheet, sh_dto: SheetDTO, src: str
-    ):
+    def export_sheet(self, ex_dto: ExcelDTO, sheet: Worksheet, sh_dto: SheetDTO):
         """TODO 优化建议，直接将准备好的数据批量写入"""
         # db 选择行
+        src = sh_dto.use_src_lang
         ex_name = ex_dto.excel_name
         sh_name = sh_dto.sheet_name
         max_col = sh_dto.max_col
@@ -82,28 +79,6 @@ class ExcelExporter:
                     text = trans_po.write_text
                     sheet.cell(c_row, d_col).value = text
                 log.debug(f"导出 {ex_name}.{sh_name} 目标语言 {dst} ")
-        # 修复 col
-        # 该步骤要删除
-        # if ex_dto.refs:
-        #     self.fix_sheet_ref(ex_dto, sh_dto, sheet)
-
-    # TODO 该函数要删除
-    def fix_sheet_ref(self, ex_dto: ExcelDTO, sh_dto: SheetDTO, sheet: Worksheet):
-        """修复所有表的 ref"""
-        max_row = sh_dto.max_row
-        # 注册一个 Parser
-        parser = CellParser()
-        for cols in sh_dto.lang_cols.values():
-            for col_alpha in cols:
-                col_num = excel_col_alpha2num(col_alpha)
-                for row in range(1, max_row + 1):
-                    # 如果存在
-                    text = sheet.cell(row, col_num).value
-                    dir_name = str(Path(ex_dto.dst_path).parent.absolute())
-                    dir_name = dir_name.replace("\\", "/")
-                    t = parser.self_fix_ref(dir_name, ex_dto.excel_name, text)
-                    sheet.cell(row, col_num).value = t
-        log.debug(f"已修复 {ex_dto.excel_name}.{sh_dto.sheet_name} 中的链接")
 
     def _copy_excel(self, excel: ExcelDTO):
         """复制文件到指定位置，如果存在，直接返回"""

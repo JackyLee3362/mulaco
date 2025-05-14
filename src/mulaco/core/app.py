@@ -33,9 +33,7 @@ class App(Scaffold):
         d = TomlConfig(config_path)
         lang_config = LanguagesConfigDTO.from_dict(d.translate.model)
         self.langs_mapper = lang_config.langs
-        self.dst_langs = sorted(
-            lang_config.dst_langs, key=lambda x: self.langs_mapper[x].order
-        )
+        self.dst_langs = lang_config.dst_langs
 
     def import_dict(self):
         """导入用户自定义字典，可选项"""

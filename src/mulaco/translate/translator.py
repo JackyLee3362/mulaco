@@ -27,14 +27,14 @@ from mulaco.translate.helper import LocalDictCache, LocalGidCache
 log = getLogger(__name__)
 
 
-class TranslateCli(metaclass=ABCMeta):
+class Translator(metaclass=ABCMeta):
     name = "api-name"
 
     @abstractmethod
     def api_translate_text(self, src: str, dst: str, text: str) -> str: ...
 
 
-class DeepLCli(TranslateCli, LocalGidCache):
+class DeepLTranslator(Translator, LocalGidCache):
     """DeepLApi 客户端"""
 
     name = "deepl-pro"
@@ -52,6 +52,7 @@ class DeepLCli(TranslateCli, LocalGidCache):
         self.init_cli()
 
     def init_cli(self):
+        log.info("初始化 DeepL 客户端")
         if self.DEEPL_AUTH_KEY is None:
             log.warning("DeepL 未配置密钥，请在环境变量中设置 DEEPL_AUTH_KEY")
             return
@@ -67,7 +68,7 @@ class DeepLCli(TranslateCli, LocalGidCache):
         # 如果没有但是
         res: list[deepl.GlossaryInfo] = self.cli.list_glossaries()
         _d = self.get_all_gid()
-        if len(res) > len(_d):
+        if len(res) != len(_d):
             log.warning("删除所有远程术语库")
             # 说明存在冗余，删除所有远程 glossary
             for r in res:
@@ -116,7 +117,7 @@ class DeepLCli(TranslateCli, LocalGidCache):
             return self.cli.get_glossary(glossary_id)
 
 
-class TencentCli(TranslateCli):
+class TencentTranslator(Translator):
     """DeepLApi 客户端"""
 
     name = "tencent-cloud"
@@ -132,6 +133,7 @@ class TencentCli(TranslateCli):
         self.init_cli()
 
     def init_cli(self):
+        log.info("初始化 腾讯云翻译 客户端")
         id = self.TENCENTCLOUD_SECRET_ID
         key = self.TENCENTCLOUD_SECRET_KEY
         if None in (id, key):
@@ -155,13 +157,14 @@ class TencentCli(TranslateCli):
             log.error(e)
 
 
-class MockCli(TranslateCli):
+class MockTranslator(Translator):
     name = "mock-cli"
     CACHE_TBL = "mock-cache"
 
     def __init__(self, app: App):
         self.cache = app.cache
         self.local_cli = LocalDictCache(app)
+        log.info("初始化本地 Mock 客户端")
 
     def api_translate_text(self, src, dst, text):
         text = self.local_cli.api_translate_text(src, dst, text)

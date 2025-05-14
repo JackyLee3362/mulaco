@@ -91,4 +91,3 @@ class LocalDictCache:
                 # TODO 单词的复数形式，小写形式等
                 translated_text = translated_text.replace(key, d[key])
         return translated_text
-        return translated_text
