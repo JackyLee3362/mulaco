@@ -25,17 +25,26 @@ poetry install
 ```sh
 # 创建虚拟环境
 python -m venv .venv
+
 # 激活环境
+# windows
 .venv/Scripts/activate
+# linux
 source venv/bin/activate
+
+# 安装依赖
 pip install -r requirements.txt
 ```
 
 ## 运行
 
 ```sh
-# 设置环境变量，应用环境变量为 mock
-set MULACO_ENV "mock" # windows
+# 设置环境变量
+# windows cmd
+set MULACO_ENV "mock"
+# windows powershell
+$env:MULACO_ENV="mock"
+# linux
 export MULACO_ENV="mock"
 
 # 测试 CLI 是否正常
