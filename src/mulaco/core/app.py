@@ -3,7 +3,7 @@ import os
 
 from mulaco.base.config import TomlConfig
 from mulaco.base.scaffold import Scaffold
-from mulaco.db.service import DbService
+from mulaco.db.db import DbService
 from mulaco.models.dto_model import BatchExcelDTO, LanguagesConfigDTO
 
 log = logging.getLogger(__name__)
@@ -51,3 +51,8 @@ class App(Scaffold):
         url = self.config.app.db.url
         echo = self.config.app.db.echo
         self.db = DbService(url, echo)
+
+    def close_db_cache(self):
+        """关闭数据库与缓存"""
+        self.db.close()
+        self.close_cache()

@@ -1,4 +1,3 @@
-import os
 from pprint import pprint
 
 from mulaco.base.config import TomlConfig
@@ -11,19 +10,19 @@ from mulaco.models.dto_model import (
 
 
 def test_load_config():
-    d = TomlConfig("config/batch1.toml")
+    d = TomlConfig("config/mock/excels.toml")
     pprint(d)
 
 
 def test_map_dict():
-    d = TomlConfig("config/batch1.toml")
+    d = TomlConfig("config/mock/excels.toml")
     dto = BatchExcelDTO.from_dict(d)
     pprint(d)
     pprint(dto)
 
 
 def test_map_dict_2():
-    d = TomlConfig("config/batch1.toml")
+    d = TomlConfig("config/mock/excels.toml")
 
     sheet = d.excels[0]["sheets"][0]
     SheetDTO.from_dict(sheet)
@@ -35,6 +34,6 @@ def test_map_dict_2():
 
 def test_map_lang():
 
-    d = TomlConfig("config/lang.test.toml")
+    d = TomlConfig("config/mock/lang.toml")
     res = LanguagesConfigDTO.from_dict(d.translate.model)
     print(res)

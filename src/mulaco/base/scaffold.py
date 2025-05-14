@@ -42,3 +42,7 @@ class Scaffold:
     def init_cache(self):
         # 数据库配置
         self.cache = JsonCache(cache_url=self.config.app.cache.url)
+
+    def close_cache(self):
+        """关闭缓存"""
+        self.cache.close()

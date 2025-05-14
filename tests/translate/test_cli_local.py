@@ -3,18 +3,18 @@ from pprint import pprint
 import pytest
 
 from mulaco.core.app import App
-from mulaco.translate.cli import LocalCli
+from mulaco.translate.helper import LocalDictCache
 
 
 @pytest.fixture(scope="module")
 def local_cli(app: App):
-    return LocalCli(app)
+    return LocalDictCache(app)
 
 
-def test_my_dict(local_cli: LocalCli):
-    pprint(local_cli.api_get_glossary("en", "zh"))
+def test_my_dict(local_cli: LocalDictCache):
+    pprint(local_cli._get_glossary("en", "zh"))
 
 
-def test_translate(local_cli: LocalCli):
+def test_translate(local_cli: LocalDictCache):
     res = local_cli.api_translate_text("en", "zh", "hello, python")
     print(res)

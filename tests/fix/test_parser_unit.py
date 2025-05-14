@@ -19,11 +19,11 @@ text_4 = 'During battles, ally Yaolings: <ref id="0" />.'
 # 新增 root
 text_5 = '<root>During battles, ally Yaolings: <ref id="0" />.</root>'
 # ref-tag 替换为 ref
-text_6 = '<root>During battles, ally Yaolings: "&[1]Main!$F$4&".</root>'
+text_6 = "<root>During battles, ally Yaolings: \"&'[1]Main'!$L$4&\".</root>"
 # 删除 root
-text_7 = 'During battles, ally Yaolings: "&[1]Main!$F$4&".'
+text_7 = "During battles, ally Yaolings: \"&'[1]Main'!$L$4&\"."
 # 新增 cal
-text_8 = '="During battles, ally Yaolings: "&[1]Main!$F$4&"."'
+text_8 = '="During battles, ally Yaolings: "&\'[1]Main\'!$L$4&"."'
 
 
 def test_1_del_cal(parser: CellParser):
@@ -49,7 +49,11 @@ def test_3_add_root_tag(parser: CellParser):
 
 def test_tag_2_ref(parser: CellParser):
 
-    res = parser.text_tag_to_ref(text_5, [RefMeta(1, "Main", "N", "4").to_dict()], 6)
+    res = parser.text_tag_to_ref(
+        text_5,
+        [RefMeta(1, "Main", "N", "4")],
+        [("path/to/excel/", "Foo.xlsx", 12)],
+    )
     assert res == text_6
     # print(res)
 

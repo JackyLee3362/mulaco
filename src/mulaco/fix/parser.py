@@ -154,7 +154,7 @@ class CellParser:
     # 该函数逻辑较为复杂
     def calculate_ref_abs_cols(
         self, refs: list[RefMeta], ref_dtos: list[ExcelDTO], order: int, total: int
-    ) -> list[int]:
+    ) -> list[tuple[str, str, int]]:
         res = []
         # 遍历 ref_meta
         for ref_meta in refs:
@@ -180,6 +180,7 @@ class CellParser:
     def text_tag_to_ref(
         self, text: str, refs: list[RefMeta], ref_info: list[tuple[str, str, int]]
     ) -> str:
+        """ref_info 是 (引用excel的绝对路径, excel名, 引用列绝对值) 的列表"""
         soup = BeautifulSoup(text, self.parser)
         for ele in soup.find_all(self.TAG_REF):
             id = int(ele.get("id"))
