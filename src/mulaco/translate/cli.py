@@ -7,6 +7,7 @@ from logging import getLogger
 # 腾讯服务需要
 from time import sleep
 from typing import Optional
+from uuid import uuid4
 
 # pip install deepl
 import deepl
@@ -20,7 +21,7 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
 # pip install --upgrade tencentcloud-sdk-python-tmt
 from tencentcloud.tmt.v20180321 import models, tmt_client
 
-from mulaco.base.db import JsonCache
+from mulaco.base.cache import JsonCache
 from mulaco.core.app import App
 from mulaco.db.service import DbService as DbService
 
@@ -128,7 +129,8 @@ class LocalCli(TranslateCli, GidCache):
                 self.api_create_glossary(src, dst, entries)
 
     def generate_gid(self, src: str, dst: str):
-        return f"gid-{src}-{dst}"
+        # return f"gid-{src}-{dst}"
+        return str(uuid4())
 
     def update_glossary(self, src: str, dst: str, entries: str):
         """根据字段创建/更新术语表

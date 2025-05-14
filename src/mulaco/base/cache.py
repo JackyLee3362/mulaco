@@ -13,7 +13,7 @@ class JsonCache:
     """
 
     def __init__(self, cache_url: str):
-        log.debug("连接数据库")
+        log.info(f"连接数据库: {cache_url}")
         self.cache = TinyDB(cache_url)
         self.query = Query()
 
@@ -21,10 +21,10 @@ class JsonCache:
         table = self.cache.table(tbl) if tbl else self.cache
         res = table.search(self.query.key == key)
         if res:
-            log.debug("数据已存在，更新键")
+            # log.debug("数据已存在，更新键")
             table.update({"val": value}, self.query.key == key)
         else:
-            log.debug("数据不存在，插入键")
+            # log.debug("数据不存在，插入键")
             table.insert({"key": key, "val": value})
 
     def get(self, key: str, tbl: str = None, default: Union[str, dict, list] = None):
@@ -41,5 +41,5 @@ class JsonCache:
         return table.all()
 
     def close(self):
-        log.debug("关闭数据库")
+        log.info("关闭数据库")
         self.cache.close()

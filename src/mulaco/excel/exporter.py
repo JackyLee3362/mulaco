@@ -27,6 +27,8 @@ class ExcelExporter:
     # -------------------- export --------------------
     def export_excel(self, excel: ExcelDTO):
         excel = self.flush_excel(excel)
+        ex_name = excel.excel_name
+        log.info(f"开始导出表 {ex_name} ...")
         try:
             # 第一步，复制数据
             self._copy_excel(excel)
@@ -38,6 +40,7 @@ class ExcelExporter:
 
             # 保存
             wb.save(excel.dst_path)
+            log.info(f"完成导出表 {ex_name} ...")
         except Exception:
             log.error(f"{excel.excel_name} 写入数据时发送错误")
         finally:
@@ -78,7 +81,7 @@ class ExcelExporter:
                     c_row = cell_po.row
                     text = trans_po.write_text
                     sheet.cell(c_row, d_col).value = text
-                log.debug(f"完成 {ex_name}.{sh_name} lang={dst} 中的写入")
+                log.debug(f"导出 {ex_name}.{sh_name} 目标语言 {dst} ")
         # 修复 col
         # 该步骤要删除
         # if ex_dto.refs:

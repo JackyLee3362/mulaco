@@ -34,7 +34,7 @@ class ExcelPostFixer:
             ref_dto = ExcelDTO.from_dict(ref_ex)
             ref_dtos.append(ref_dto)
 
-        log.debug(f"表 {ex_name} 翻译后处理开始")
+        log.debug(f"开始修复翻译 {ex_name} ...")
         for sheet in excel.sheets:
             sh_name = sheet.sheet_name
             bo = ExcelSheetBO(
@@ -56,5 +56,5 @@ class ExcelPostFixer:
                     )
                     trans_po.write_text = proc_text
                     self.db.upsert_trans_info(trans_po)
-                log.debug(f"表 {sh_name} 列 {dst} 翻译后处理完成")
-        log.debug(f"表 {ex_name} 翻译后处理完成")
+                log.debug(f"修复 {ex_name}.{sh_name} 目标语言 {dst} ")
+        log.debug(f"完成修复翻译 {ex_name} ...")

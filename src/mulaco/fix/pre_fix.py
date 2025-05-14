@@ -17,7 +17,7 @@ class ExcelPreFixer:
         self.cache = app.cache
         self.parser = CellParser()
 
-    def pre_fix_excel(self, excel: ExcelDTO):
+    def pre_process_excel(self, excel: ExcelDTO):
         ex_name = excel.excel_name
         for sheet in excel.sheets:
             sh_name = sheet.sheet_name
@@ -38,4 +38,4 @@ class ExcelPreFixer:
                 if info:
                     cell_po.json = info
                 self.db.upsert_cell(cell_po)
-            log.debug(f"{ex_name}.{sh_name} 已经做好文本预处理")
+            log.debug(f"完成预处理 {ex_name}.{sh_name}")

@@ -6,7 +6,7 @@ import time
 # 可以看作是配置服务向下传递的 DTO
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 from dataclasses_json import dataclass_json
 
@@ -56,11 +56,6 @@ class SheetDTO:
     def from_dict(self, *args, **kwargs) -> SheetDTO: ...
 
     def to_dict(self, *args, **kwargs) -> dict: ...
-
-
-# ref_excel: Optional[str] = field(default=None)
-# ref_sheet: Optional[str] = field(default=None)
-# params: Optional[dict] = field(default=None)
 
 
 @dataclass_json

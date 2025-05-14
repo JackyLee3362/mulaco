@@ -44,7 +44,7 @@ class App(Scaffold):
             self.user_dict = {}
             return
         user_dict = TomlConfig(config_path)
-        self.user_dict = user_dict.dict
+        self.user_dict = user_dict.get("dict", {})
 
     def init_db(self):
         """初识化数据库"""

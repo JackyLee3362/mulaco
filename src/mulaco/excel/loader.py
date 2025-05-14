@@ -26,11 +26,12 @@ class ExcelLoader:
         TODO: 优化建议
         在初始化的时候
         把要的行和列读到缓存，再进行持久化操作，
-        否则一张表就要 1-2 分钟，很费时。
+        否则数据量大的话一张表就要 1-2 分钟，很费时。
         """
+        ex_name = excel.excel_name
         try:
+            log.info(f"开始加载 {ex_name} ...")
             wb = load_workbook(excel.src_path)
-            ex_name = excel.excel_name
             for sheet_dto in excel.sheets:
                 sheet = wb[sheet_dto.sheet_name]
                 self._set_db_exsh_meta(ex_name, sheet_dto)
@@ -38,9 +39,10 @@ class ExcelLoader:
                     sheet.max_row, sheet.max_column, excel, sheet_dto
                 )
                 self._set_db_sheet_raw_data(ex_name, sheet, sheet_dto)
+            log.info(f"完成加载 {ex_name} ...")
         except Exception:
             # log.exception(e)
-            log.error(f"{ex_name} 载入数据时发生错误")
+            log.error(f"加载出错!!! {ex_name} ！")
         finally:
             wb.close()
 
@@ -94,4 +96,4 @@ class ExcelLoader:
                         raw_text=raw_text,
                     )
                     self.db.upsert_cell(cell_po)
-                log.debug(f"已处理 {ex_name}.{sh_name} 的 {col_alpha} 列")
+                log.debug(f"加载 {ex_name}.{sh_name} 的 {col_alpha} 列")

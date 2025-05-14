@@ -1,6 +1,7 @@
+from mulaco.base.cache import JsonCache
 from mulaco.base.config import TomlConfig
+from mulaco.base.console import console
 from mulaco.base.constant import ENV, SETTING_ENV_FILE_PATH, SETTINGS_DEFAULT_PATH
-from mulaco.base.db import JsonCache
 from mulaco.base.logger import set_logger
 
 # __all__ = ["config", "base_db", "Base", "AppDbClient", "DbClientBase"]
@@ -14,6 +15,7 @@ class Scaffold:
         self.cache = None
 
     def init_base(self):
+        console.print(f"当前环境: {ENV}")
         self.init_config()
         self.init_logging()
         self.init_cache()
