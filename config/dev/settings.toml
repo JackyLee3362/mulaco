@@ -11,4 +11,4 @@ excel_conf_url = "config/dev/excels.toml"
 [app.translate]
 # 相对路径
 lang_conf_url = "config/dev/lang.toml"
-dict_url = "config/dev/dict.toml"
+dict_url = "config/dict.toml"

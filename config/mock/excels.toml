@@ -1,0 +1,12 @@
+src_dir = "data/src"
+dst_dir = "data/target"
+
+[[excels]]
+excel_name = "MockData1.xlsx"
+# skip = true
+
+[[excels.sheets]]
+header_row = 3
+sheet_name = "Sheet1"
+use_src_lang = "en"
+lang_cols = { en = ["C"], zh = ["B"] }

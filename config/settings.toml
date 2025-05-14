@@ -14,6 +14,7 @@ fmt = "[%(asctime)s] %(name)s - %(levelname)-8s %(funcName)s  : %(message)s"
 
 [app.db]
 url = "sqlite://db/app.db"
+echo = false
 
 [app.cache]
 url = "db/cache.json"

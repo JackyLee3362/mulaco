@@ -1,0 +1,14 @@
+[app.db]
+url = "sqlite:///db/app.mock.db"
+echo = false
+
+[app.cache]
+url = "db/cache.mock.json"
+
+[app.excel]
+excel_conf_url = "config/mock/excels.toml"
+
+[app.translate]
+# 相对路径
+lang_conf_url = "config/mock/lang.toml"
+dict_url = "config/dict.toml"

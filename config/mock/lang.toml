@@ -1,4 +1,4 @@
-# 语言配置
+# 语言配置 使用 mock-cli 不使用真实的 dev
 [translate.model.langs.zh]
 name = '简中'
 code = 'zh'
@@ -18,46 +18,46 @@ active = false
 name = '德语'
 code = 'de'
 order = 1
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.ko]
 name = '韩语'
 code = 'ko'
 order = 2
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.th]
 name = '泰语'
 code = 'th'
 order = 3
-service_name = "tencent-cloud"
+service_name = "mock-cli"
 
 [translate.model.langs.ru]
 name = '俄语'
 code = 'ru'
 order = 4
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.es]
 name = '西班牙语'
 code = 'es'
 order = 5
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.fr]
 name = '法语'
 code = 'fr'
 order = 6
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.pt]
 name = '葡萄牙语'
 code = 'pt'
 order = 7
-service_name = "deepl-pro"
+service_name = "mock-cli"
 
 [translate.model.langs.it]
 name = '意大利语'
 code = 'it'
 order = 8
-service_name = "deepl-pro"
+service_name = "mock-cli"
