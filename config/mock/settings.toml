@@ -11,4 +11,5 @@ excel_conf_url = "config/mock/excels.toml"
 [app.translate]
 # 相对路径
 lang_conf_url = "config/mock/lang.toml"
+# lang_conf_url = "config/mock/lang.mock.toml"
 dict_url = "config/dict.toml"

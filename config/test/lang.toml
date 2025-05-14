@@ -52,7 +52,7 @@ service_name = "tencent-cloud"
 
 # [translate.model.langs.pt]
 # name = '葡萄牙语'
-# code = 'pt'
+# code = 'pt-br'
 # order = 7
 # service_name = "deepl-pro"
 
