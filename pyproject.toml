@@ -1,6 +1,6 @@
 [project]
-name = "mulaco-v2"
-version = "0.0.1"
+name = "mulaco"
+version = "1.0.1"
 description = ""
 requires-python = ">=3.9,<3.13"
 authors = [{ name = "jackylee", email = "jieli.work@qq.com" }]

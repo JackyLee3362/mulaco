@@ -4,23 +4,44 @@
 
 ## 安装
 
-使用 poetry (推荐)
+```sh
+# 克隆仓库
+git clone git@github.com:JackyLee3362/mulaco.git
+# 进入项目
+cd ./mulaco
+```
+
+### 依赖安装
+
+方案一：使用 `poetry`（推荐）
 
 ```sh
+
 poetry install
 ```
 
-使用 pip
+方案二：使用 pip + 虚拟环境
 
 ```sh
-pip install requirements.txt
+# 创建虚拟环境
+python -m venv .venv
+# 激活环境
+.venv/Scripts/activate
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## 运行
 
 ```sh
+echo 
+
 # 测试 CLI 是否正常
 python main.py --help
+# 批量运行所有
+python main.py run
+
+# 分批运行
 # 加载数据
 python main.py load
 # 修复数据
@@ -31,6 +52,11 @@ python main.py translate
 python main.py post
 # 导出
 python main.py export
+
+
+# 开发工具
+# 清楚缓存数据
+python main.py dev:clear
 ```
 
 ## 配置
