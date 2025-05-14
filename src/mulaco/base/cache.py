@@ -41,5 +41,5 @@ class JsonCache:
         return table.all()
 
     def close(self):
-        log.info("关闭数据库")
+        log.info("关闭缓存")
         self.cache.close()

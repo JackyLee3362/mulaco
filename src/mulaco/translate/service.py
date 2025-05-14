@@ -3,7 +3,7 @@ from __future__ import annotations
 from logging import getLogger
 
 from mulaco.core.app import App
-from mulaco.db.service import DbService as DbService
+from mulaco.db.db import DbService as DbService
 from mulaco.excel.utils import excel_col_alpha2num
 from mulaco.models.bo_model import ExcelSheetBO, TransInfoBO
 from mulaco.models.dto_model import ExcelDTO, LanguageDTO

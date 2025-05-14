@@ -23,7 +23,7 @@ class ExcelPostFixer:
 
     def post_fix_excel(self, excel: ExcelDTO):
         ex_name = excel.excel_name
-        cur_excel_cache = self.cache.get(ex_name, self.EXCELS_TBL)
+        cur_excel_cache = self.cache.get(ex_name, self.EXCELS_TBL, {})
         ref_excel_names = cur_excel_cache.get("refs", [])
         # 提前拿出 ref 信息
         ref_dtos = []

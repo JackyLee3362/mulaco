@@ -32,6 +32,10 @@ class DbService:
         self.cell_repo = CellInfoRepo(self.session)
         self.trans_repo = TransInfoRepo(self.session)
 
+    def close(self) -> None:
+        log.info("关闭数据库")
+        self.session.close()
+
     # --------------------------  Exsh  --------------------------
 
     def get_exsh_by_name(self, excel: str, sheet: str) -> ExcelSheetPO:
