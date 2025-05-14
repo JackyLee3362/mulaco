@@ -2,8 +2,8 @@ from pprint import pprint
 
 import pytest
 
-from mulaco.base.config import TomlConfig
-from mulaco.db.service import DbService
+from mulaco.core.app import App
+from mulaco.db.db import DbService
 from mulaco.db.sql import (
     build_sql_get_all_not_proc_trans,
     build_sql_get_all_not_translated_cells,
@@ -11,22 +11,12 @@ from mulaco.db.sql import (
     build_sql_get_not_proc_cells,
 )
 from mulaco.models.bo_model import ExcelSheetBO
-from mulaco.models.dto_model import BatchExcelDTO
 
 
 @pytest.fixture(scope="module")
-def db() -> DbService:
-    db = DbService("sqlite:///db/test.db")
-    return db
+def excel(app: App) -> ExcelSheetBO:
 
-
-@pytest.fixture(scope="module")
-def excel() -> ExcelSheetBO:
-
-    config_file = "config/batch1.toml"
-    d = TomlConfig(config_file)
-    eb = BatchExcelDTO.from_dict(d)
-    excel = eb.excels[0]
+    excel = app.batch_excels.excels[0]
     sheet = excel.sheets[0]
     exsh = ExcelSheetBO(excel.excel_name, sheet.sheet_name, sheet.header_row)
 

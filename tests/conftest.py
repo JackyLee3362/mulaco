@@ -4,7 +4,7 @@ from mulaco.base.cache import JsonCache
 from mulaco.base.config import TomlConfig
 from mulaco.base.scaffold import Scaffold
 from mulaco.core.app import App
-from mulaco.db.service import DbService
+from mulaco.db.db import DbService
 from mulaco.models.bo_model import CellInfoBO, ExcelSheetBO, TransInfoBO
 from mulaco.models.mapper import cell_bo_map_po, exsh_bo_map_po, trans_bo_map_po
 
@@ -17,13 +17,15 @@ def config() -> TomlConfig:
 
 
 @pytest.fixture(scope="session")
-def mem() -> DbService:
+def mem():
     print("conftest 数据库配置 (memory) ")
-    return DbService("sqlite:///:memory:")
+    db = DbService("sqlite:///:memory:")
+    yield db
+    db.close()
 
 
 @pytest.fixture(scope="session")
-def mem_db_data() -> DbService:
+def mem_db_data():
     print("conftest 数据库配置 (memory) 包含测试数据 ")
     # 插入 exsh 表
     e1s1 = ExcelSheetBO(id=1, excel="ex1", sheet="sh1")
@@ -49,35 +51,40 @@ def mem_db_data() -> DbService:
     db.upsert_cell(cell_bo_map_po(c3))
     db.upsert_trans_info(trans_bo_map_po(t1zh))
     db.upsert_trans_info(trans_bo_map_po(t2jp))
-    return db
+    yield db
+    db.close()
 
 
 @pytest.fixture(scope="session")
-def db() -> DbService:
+def db():
     print("conftest 数据库配置 (test.db) ")
     db = DbService("sqlite:///db/app.test.db", True)
-    return db
+    yield db
+    db.close()
 
 
 @pytest.fixture(scope="session")
-def cache() -> JsonCache:
+def cache():
     print("conftest 缓存配置 (cache.test.json)")
     cache = JsonCache("db/cache.test.json")
-    return cache
+    yield cache
+    cache.close()
 
 
 # 应用骨架是会话级别的
 @pytest.fixture(scope="session")
-def scaffold() -> Scaffold:
+def scaffold():
     scaffold = Scaffold()
     scaffold.init_base()
-    return scaffold
+    yield scaffold
+    scaffold.close_cache()
 
 
 # 应用是会话级别的
 @pytest.fixture(scope="session")
-def app() -> App:
+def app():
     app = App()
     app.init_base()
     app.init_app()
-    return app
+    yield app
+    app.close_db_cache()

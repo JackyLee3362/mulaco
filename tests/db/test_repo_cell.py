@@ -3,7 +3,7 @@ from pprint import pprint
 import pytest
 
 from mulaco.db.repo import CellInfoRepo
-from mulaco.db.service import DbService
+from mulaco.db.db import DbService
 from mulaco.models.po_model import CellInfoPO
 
 
