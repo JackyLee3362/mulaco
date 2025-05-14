@@ -34,13 +34,19 @@ pip install -r requirements.txt
 ## 运行
 
 ```sh
-echo 
+# 设置环境变量，应用环境变量为 mock
+set MULACO_ENV "mock" # windows
+export MULACO_ENV="mock"
 
 # 测试 CLI 是否正常
 python main.py --help
 # 批量运行所有
 python main.py run
+```
 
+### 子模块运行
+
+```sh
 # 分批运行
 # 加载数据
 python main.py load
