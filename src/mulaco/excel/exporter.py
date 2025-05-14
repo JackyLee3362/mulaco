@@ -109,6 +109,7 @@ class ExcelExporter:
         """复制文件到指定位置，如果存在，直接返回"""
         src = Path(excel.src_path)
         dst = Path(excel.dst_path)
+        dst.parent.mkdir(exist_ok=True)
         if dst.exists():
             return
         else:
