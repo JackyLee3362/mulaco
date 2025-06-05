@@ -56,7 +56,6 @@ def build_sql_get_not_proc_cells(bo: ExcelSheetBO, src: str, col: int = None) ->
         .where(
             ExcelSheetPO.excel == bo.excel,
             ExcelSheetPO.sheet == bo.sheet,
-            CellInfoPO.src_lang == src,
         )
         # 业务约束
         .where(
@@ -74,6 +73,8 @@ def build_sql_get_not_proc_cells(bo: ExcelSheetBO, src: str, col: int = None) ->
     # 参数约束
     if col:
         stmt = stmt.where(CellInfoPO.col == col)
+    if src:
+        stmt = stmt.where(CellInfoPO.src_lang == src)
     return stmt
 
 

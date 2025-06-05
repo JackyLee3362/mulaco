@@ -27,7 +27,7 @@ class ExcelPreFixer:
                 header=sheet.header_row,
             )
             # 获取所有没有处理过的 cell (sheet 层面)
-            res = self.db.get_all_not_processed_cells(bo, "en", None)
+            res = self.db.get_all_not_processed_cells(bo)
             for exsh_po, cell_po in res:
                 # 提前存储数据
                 cell_po: CellInfoPO

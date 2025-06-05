@@ -136,7 +136,7 @@ class DbService:
         return res
 
     def get_all_not_processed_cells(
-        self, bo: ExcelSheetBO, src: str, col: int = None
+        self, bo: ExcelSheetBO, src: str = None, col: int = None
     ) -> list[ExcelSheetPO, CellInfoPO]:
         """获得【所有】【翻译过】但是【没有预处理】 的 Cell
         为什么返回两个对象：处理 Ref 可能需要 excel 和 sheet 信息
