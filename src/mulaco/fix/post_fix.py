@@ -43,7 +43,7 @@ class ExcelPostFixer:
             # 获取所有没有处理过的 cell (sheet 层面)
             for dst in self.dst_langs:
                 # TODO 配置 src
-                res = self.db.get_all_not_processed_trans(bo, "en", dst, None)
+                res = self.db.get_all_not_processed_trans(bo, None, dst, None)
                 for ex_po, cell_po, trans_po in res:
                     trans_po: TransInfoPO
                     text = trans_po.trans_text

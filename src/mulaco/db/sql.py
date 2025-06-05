@@ -79,7 +79,7 @@ def build_sql_get_not_proc_cells(bo: ExcelSheetBO, src: str, col: int = None) ->
 
 
 def build_sql_get_all_not_proc_trans(
-    bo: ExcelSheetBO, src: str, dst: str = None, col: int = None
+    bo: ExcelSheetBO, src: str = None, dst: str = None, col: int = None
 ) -> Select:
     stmt = (
         # 返回结果
@@ -92,7 +92,6 @@ def build_sql_get_all_not_proc_trans(
         .where(
             ExcelSheetPO.excel == bo.excel,
             ExcelSheetPO.sheet == bo.sheet,
-            CellInfoPO.src_lang == src,
         )
         # 业务约束
         .where(
@@ -108,6 +107,8 @@ def build_sql_get_all_not_proc_trans(
         .order_by(CellInfoPO.row)
     )
     # 参数约束
+    if src:
+        stmt = stmt.where(CellInfoPO.src_lang == src)
     if col:
         stmt = stmt.where(CellInfoPO.col == col)
     if dst:
