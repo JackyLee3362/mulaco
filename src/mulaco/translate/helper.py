@@ -76,7 +76,7 @@ class LocalDictCache:
             for dst, d2 in d1.items():
                 s = sorted(d2.keys(), key=lambda x: -len(x))
                 self.user_ordered_key.setdefault(src, {})
-                self.user_ordered_key[dst] = s
+                self.user_ordered_key[src][dst] = s
         log.info("本地用户字典排序成功")
 
     def api_translate_text(self, src: str, dst: str, text: str):
