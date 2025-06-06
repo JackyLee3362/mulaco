@@ -60,8 +60,8 @@ class DeepLTranslator(Translator, LocalGidCache):
             self.cli = deepl.Translator(self.DEEPL_AUTH_KEY)
             self.init_glossoaries()
 
-        except Exception:
-            log.warning("初始化 DeepL 客户端错误，请联系开发人员")
+        except Exception as e:
+            log.error(f"初始化 DeepL 客户端错误: {e}")
 
     def init_glossoaries(self):
         log.debug("deepL 使用用户字典初始化远程术语库")

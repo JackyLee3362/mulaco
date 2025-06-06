@@ -62,8 +62,8 @@ class BatchService:
         for excel in self.batch_excels.excels:
             try:
                 trans_service.translate_excel(excel)
-            except Exception:
-                log.error(f"{excel.excel_name} 翻译出错")
+            except Exception as e:
+                log.error(f"{excel.excel_name} 翻译出错: {e}")
         log.info("完成批量翻译 excels ...")
 
     # 第 4 步：修复翻译
