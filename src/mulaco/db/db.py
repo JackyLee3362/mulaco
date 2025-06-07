@@ -64,8 +64,8 @@ class DbService:
             for cell in cells:
                 self.trans_repo.batch_delete_by_cell_id(cell.id)
             self.session.commit()
-        except Exception:
-            log.error("删除 excel sheet 错误")
+        except Exception as e:
+            log.error(f"删除 excel sheet 错误: {e}")
             # log.exception(e)
             self.session.rollback()
 
@@ -85,9 +85,9 @@ class DbService:
                 new_po = self.exsh_repo.insert_one(po)
             self.session.commit()
             return new_po.id
-        except Exception:
+        except Exception as e:
             # log.exception(e)
-            log.error("更新/插入错误")
+            log.error(f"更新/插入错误: {e}")
             self.session.rollback()
 
     # --------------------------  Cell  --------------------------
@@ -119,9 +119,9 @@ class DbService:
                 new_po = self.cell_repo.insert_one(po)
             self.session.commit()
             return new_po.id
-        except Exception:
+        except Exception as e:
             # log.exception(e)
-            log.error("更新/插入 Cell 错误")
+            log.error(f"更新/插入 Cell 错误: {e}")
             self.session.rollback()
 
     # --------------------------  Trans  --------------------------
@@ -180,7 +180,7 @@ class DbService:
                 new_po = self.trans_repo.insert_one(po)
             self.session.commit()
             return new_po.id
-        except Exception:
-            log.error("增加 trans info 错误")
+        except Exception as e:
+            log.error(f"增加 trans info 错误: {e}")
             # log.exception(e)
             self.session.rollback()

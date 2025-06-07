@@ -40,9 +40,9 @@ class ExcelLoader:
                 )
                 self._set_db_sheet_raw_data(ex_name, sheet, sheet_dto)
             log.info(f"完成加载 {ex_name} ...")
-        except Exception:
+        except Exception as e:
             # log.exception(e)
-            log.error(f"加载出错!!! {ex_name} ！")
+            log.error(f"{ex_name}加载出错: {e}")
         finally:
             wb.close()
 

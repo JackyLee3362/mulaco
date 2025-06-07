@@ -39,8 +39,8 @@ class ExcelExporter:
             # 保存
             wb.save(excel.dst_path)
             log.info(f"完成导出表 {ex_name} ...")
-        except Exception:
-            log.error(f"{excel.excel_name} 写入数据时发送错误")
+        except Exception as e:
+            log.error(f"{excel.excel_name} 写入数据时发送错误: {e}")
         finally:
             wb.close()
 

@@ -38,8 +38,8 @@ class BatchService:
         for excel in self.batch_excels.excels:
             try:
                 loader.load_excel(excel)
-            except Exception:
-                log.error(f"{excel.excel_name} 加载出错")
+            except Exception as e:
+                log.error(f"{excel.excel_name} 加载出错: {e}")
         log.info("完成批量加载 excel ...")
 
     # 第 2 步：预处理数据
@@ -50,8 +50,8 @@ class BatchService:
         for excel in self.batch_excels.excels:
             try:
                 pre_fixer.pre_process_excel(excel)
-            except Exception:
-                log.error(f"批量预处理出错!!! {excel.excel_name} ")
+            except Exception as e:
+                log.error(f"{excel.excel_name} 批量预处理出错: {e}")
         log.info("完成批量预处理 excel 原始文本 ...")
 
     # 第 3 步：翻译数据
@@ -75,8 +75,8 @@ class BatchService:
         for excel in self.batch_excels.excels:
             try:
                 post_fixer.post_fix_excel(excel)
-            except Exception:
-                log.error(f"批量修复翻译出错!!! {excel.excel_name}")
+            except Exception as e:
+                log.error(f"{excel.excel_name} 批量修复翻译出错: {e}")
         log.info("完成批量修复翻译 excel 翻译 ...")
 
     # 第 5 步：导出数据
@@ -87,6 +87,6 @@ class BatchService:
         for excel in self.batch_excels.excels:
             try:
                 exporter.export_excel(excel)
-            except Exception:
-                log.error(f"{excel.excel_name} 导出出错")
+            except Exception as e:
+                log.error(f"{excel.excel_name} 导出出错: {e}")
         log.info("完成批量导出 excel ...")
